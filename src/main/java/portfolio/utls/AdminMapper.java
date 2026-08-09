@@ -1,13 +1,18 @@
 package portfolio.utls;
 
+import java.beans.PropertyDescriptor;
 import java.util.Map;
 
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.stereotype.Component;
 
 import portfolio.dto.AdminActivityRequestDTO;
 import portfolio.dto.AdminActivityResponseDTO;
 import portfolio.dto.AdminAddressRequestDTO;
 import portfolio.dto.AdminAddressResponseDTO;
+import portfolio.dto.AdminContactRequestDTO;
+import portfolio.dto.AdminContactResponseDTO;
 import portfolio.dto.AdminEducationRequestDTO;
 import portfolio.dto.AdminEducationResponseDTO;
 import portfolio.dto.AdminExperienceRequestDTO;
@@ -21,6 +26,7 @@ import portfolio.dto.LicenseAndCertificationResponseDTO;
 import portfolio.model.Admin;
 import portfolio.model.AdminActivity;
 import portfolio.model.AdminAddress;
+import portfolio.model.AdminContact;
 import portfolio.model.AdminEducation;
 import portfolio.model.AdminExperience;
 import portfolio.model.AdminProject;
@@ -375,5 +381,50 @@ public class AdminMapper {
     		}
     	});
     }
+    
+    public AdminContact convertDTOToAdminContact(AdminContactRequestDTO dto) {
+    	
+    	AdminContact contact = new AdminContact();
+    	
+    	contact.setEmail(dto.getEmail());
+    	contact.setPhone(dto.getPhone());
+    	
+    	return contact;
+    }
+    
+    public AdminContactResponseDTO convertAdminContactToDTO(AdminContact contact) {
+    	
+    	AdminContactResponseDTO dto = new AdminContactResponseDTO();
+    	
+    	dto.setId(contact.getId());
+    	dto.setEmail(contact.getEmail());
+    	dto.setPhone(contact.getPhone());
+    	
+    	if(contact.getAdmin() != null) {
+    		dto.setAdminUser(contact.getAdmin().getUserName());
+    	}
+    	
+    	return dto;
+    }
+    
+    public void updateAdminContact(AdminContactRequestDTO adminContactRequestDTO, AdminContact adminContact) {
+    	
+    	BeanWrapper source = new BeanWrapperImpl(adminContactRequestDTO);
+    	BeanWrapper target = new BeanWrapperImpl(adminContact);
+    	
+    	for(PropertyDescriptor pd: source.getPropertyDescriptors()) {
+    		
+    		String property = pd.getName();
+    		
+    		if("class".equals("property")) {
+    			continue;
+    		}
+    		
+    		Object value = source.getPropertyValue(property);
+    		
+    		if(value != null && target.isWritableProperty(property)) {
+    			target.setPropertyValue(property, value);
+    		}
+    	}
+    }
 }
-
