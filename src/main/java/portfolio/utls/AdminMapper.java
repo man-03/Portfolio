@@ -17,6 +17,8 @@ import portfolio.dto.AdminEducationRequestDTO;
 import portfolio.dto.AdminEducationResponseDTO;
 import portfolio.dto.AdminExperienceRequestDTO;
 import portfolio.dto.AdminExperienceResponseDTO;
+import portfolio.dto.AdminLinkRequestDTO;
+import portfolio.dto.AdminLinkResponseDTO;
 import portfolio.dto.AdminProjectRequestDTO;
 import portfolio.dto.AdminProjectResponseDTO;
 import portfolio.dto.AdminRequestDTO;
@@ -29,6 +31,7 @@ import portfolio.model.AdminAddress;
 import portfolio.model.AdminContact;
 import portfolio.model.AdminEducation;
 import portfolio.model.AdminExperience;
+import portfolio.model.AdminLink;
 import portfolio.model.AdminProject;
 import portfolio.model.LicenseAndCertification;
 
@@ -427,4 +430,40 @@ public class AdminMapper {
     		}
     	}
     }
+    
+    public AdminLink convertDTOToAdminLink(AdminLinkRequestDTO dto) {
+    	
+    	AdminLink link = new AdminLink();
+    	
+    	link.setPlatform(dto.getPlatform());
+    	link.setUrl(dto.getUrl());
+    	
+    	return link;
+    }
+    
+	public AdminLinkResponseDTO convertAdminLinkToDTO(AdminLink link) {
+	    	
+    	AdminLinkResponseDTO dto = new AdminLinkResponseDTO();
+    	
+    	dto.setId(link.getId());
+    	dto.setPlatform(link.getPlatform());
+    	dto.setUrl(link.getUrl());
+    	
+    	if(link.getAdmin() != null) {
+    		dto.setAdminUser(link.getAdmin().getUserName());
+    	}
+    	
+    	return dto;
+	}
+	
+	public void updateAdminLink(Map<String, Object> requestBody, AdminLink link) {
+		
+		BeanWrapper beanWrapper = new BeanWrapperImpl(link);
+		
+		requestBody.forEach((key, value) -> {
+			if(beanWrapper.isWritableProperty(key)) {
+				beanWrapper.setPropertyValue(key, value);
+			}
+		});
+	}
 }
