@@ -147,8 +147,8 @@ public class AdminProject {
     public boolean equals(Object o) {
     	if(this == o) return true;
     	if(!(o instanceof AdminProject)) return false;
-    	AdminProject projects = (AdminProject) o;
-    	return Objects.equals(id, projects.id);
+    	AdminProject project = (AdminProject) o;
+    	return Objects.equals(id, project.id);
     }
     
     @Override

@@ -72,8 +72,8 @@ public class AdminActivity {
 	public boolean equals(Object o) {
 		if(this == o) return true;
 		if(!(o instanceof AdminActivity)) return false;
-		AdminActivity experience = (AdminActivity) o;
-		return Objects.equals(id, experience.id);
+		AdminActivity activity = (AdminActivity) o;
+		return Objects.equals(id, activity.id);
 	}
 	
 	@Override

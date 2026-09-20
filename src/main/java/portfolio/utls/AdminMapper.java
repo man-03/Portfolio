@@ -7,6 +7,9 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import portfolio.dto.AdminActivityRequestDTO;
 import portfolio.dto.AdminActivityResponseDTO;
 import portfolio.dto.AdminAddressRequestDTO;
@@ -23,6 +26,10 @@ import portfolio.dto.AdminProjectRequestDTO;
 import portfolio.dto.AdminProjectResponseDTO;
 import portfolio.dto.AdminRequestDTO;
 import portfolio.dto.AdminResponseDTO;
+import portfolio.dto.AdminSkillRequestDTO;
+import portfolio.dto.AdminSkillResponseDTO;
+import portfolio.dto.AdminSkillsCategoryRequestDTO;
+import portfolio.dto.AdminSkillsCategoryResponseDTO;
 import portfolio.dto.LicenseAndCertificationRequestDTO;
 import portfolio.dto.LicenseAndCertificationResponseDTO;
 import portfolio.model.Admin;
@@ -33,11 +40,19 @@ import portfolio.model.AdminEducation;
 import portfolio.model.AdminExperience;
 import portfolio.model.AdminLink;
 import portfolio.model.AdminProject;
+import portfolio.model.AdminSkill;
+import portfolio.model.AdminSkillsCategory;
 import portfolio.model.LicenseAndCertification;
 
 @Component
 public class AdminMapper {
 
+	private final ObjectMapper objectMapper;
+
+    public AdminMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+    
 	//Admin
     public Admin convertDTOToAdmin(AdminRequestDTO dto) {
 
@@ -465,5 +480,59 @@ public class AdminMapper {
 				beanWrapper.setPropertyValue(key, value);
 			}
 		});
+	}
+
+    public AdminSkillsCategory convertDTOToAdminSkillsCategory(AdminSkillsCategoryRequestDTO dto) {
+		
+		AdminSkillsCategory category = new AdminSkillsCategory();
+		category.setCategory(dto.getCategory());
+		
+		return category;	
+	}
+	
+	public AdminSkillsCategoryResponseDTO convertAdminSkillsCategoryToDTO(AdminSkillsCategory category) {
+			
+		AdminSkillsCategoryResponseDTO dto = new AdminSkillsCategoryResponseDTO();
+		dto.setId(category.getId());
+		dto.setCategory(category.getCategory());
+		
+		if(category.getAdmin() != null) {
+    		dto.setAdminUser(category.getAdmin().getUserName());
+    	}
+		
+		return dto;
+	}
+	
+	public void updateAdminSkillsCategory(AdminSkillsCategoryRequestDTO dto, AdminSkillsCategory category) throws JsonProcessingException {
+
+	    objectMapper.updateValue(category, dto);
+	}
+	
+	public AdminSkill convertDTOToAdminSkill(
+	        AdminSkillRequestDTO dto) {
+
+	    AdminSkill skill = new AdminSkill();
+	    skill.setSkill(dto.getSkill());
+	    
+	    return skill;
+	}
+	
+	public AdminSkillResponseDTO convertAdminSkillToDTO(
+	        AdminSkill skill) {
+
+	    AdminSkillResponseDTO dto = new AdminSkillResponseDTO();
+	    
+	    if (skill.getAdminSkillsCategory() != null) {
+	        dto.setCategoryId(skill.getAdminSkillsCategory().getId());
+	    }
+	    dto.setId(skill.getId());
+	    dto.setSkill(skill.getSkill());
+	    
+	    return dto;
+	}
+	
+	public void updateAdminSkill(Map<String, Object> requestBody, AdminSkill skill) throws JsonProcessingException {
+
+	    objectMapper.updateValue(skill, requestBody);
 	}
 }
