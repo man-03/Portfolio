@@ -68,7 +68,6 @@ public class AdminMapper {
         admin.setHeadLine(dto.getHeadLine());
         admin.setAbout(dto.getAbout());
         admin.setProfileImageUrl(dto.getProfileImageUrl());
-        admin.setPassword(dto.getPassword());
 
         return admin;
     }
@@ -128,10 +127,6 @@ public class AdminMapper {
         
         if (dto.getProfileImageUrl() != null) {
         	admin.setProfileImageUrl(dto.getProfileImageUrl());
-        }
-
-        if (dto.getPassword() != null) {
-            admin.setPassword(dto.getPassword());
         }
     }
     

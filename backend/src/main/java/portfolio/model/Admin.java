@@ -43,15 +43,12 @@ public class Admin {
 	@Column(name="profile_image_url")
 	private String profileImageUrl;
 	
-	@Column(name = "password")
-	private String password;
-	
 	public Admin() {
 		
 	}
 
 	public Admin(String userName, String firstName, String lastName, LocalDate dateOfBirth, String pronoun,
-            String currentPosition, String myQuote, String headLine, String about, String profileImageUrl, String password) {
+            String currentPosition, String myQuote, String headLine, String about, String profileImageUrl) {
 
 	   this.userName = userName;
 	   this.firstName = firstName;
@@ -63,7 +60,6 @@ public class Admin {
 	   this.headLine = headLine;
 	   this.about = about;
 	   this.profileImageUrl = profileImageUrl;
-	   this.password = password;
 	}
 	
 	public String getUserName() {
@@ -144,14 +140,6 @@ public class Admin {
     
     public void setProfileImageUrl(String profileImageUrl) {
     	this.profileImageUrl = profileImageUrl;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     // equals()
