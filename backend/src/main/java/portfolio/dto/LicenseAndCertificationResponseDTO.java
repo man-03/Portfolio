@@ -13,7 +13,6 @@ public class LicenseAndCertificationResponseDTO {
     private String credentialUrl;
     private String landcUrl;
     private String orgLogoUrl;
-    private String adminUser;
 
     public LicenseAndCertificationResponseDTO() {
 
@@ -24,8 +23,7 @@ public class LicenseAndCertificationResponseDTO {
             Short startMonth, Short startYear,
             Short endMonth, Short endYear,
             String credentialId, String credentialUrl,
-            String landcUrl, String orgLogoUrl,
-            String adminUser) {
+            String landcUrl, String orgLogoUrl) {
 
         this.id = id;
         this.name = name;
@@ -38,7 +36,6 @@ public class LicenseAndCertificationResponseDTO {
         this.credentialUrl = credentialUrl;
         this.landcUrl = landcUrl;
         this.orgLogoUrl = orgLogoUrl;
-        this.adminUser = adminUser;
     }
 
     public Long getId() {
@@ -128,14 +125,6 @@ public class LicenseAndCertificationResponseDTO {
     public void setOrgLogoUrl(String orgLogoUrl) {
         this.orgLogoUrl = orgLogoUrl;
     }
-    
-    public String getAdminUser() {
-    	return adminUser;
-    }
-    public void setAdminUser(String adminUser) {
-    	this.adminUser = adminUser;
-    }
-    
 
     @Override
     public String toString() {
@@ -149,7 +138,6 @@ public class LicenseAndCertificationResponseDTO {
                 ", credentialId=" + credentialId +
                 ", credentialUrl=" + credentialUrl +
                 ", landcUrl=" + landcUrl +
-                ", orgLogoUrl=" + orgLogoUrl +
-                ", adminUser=" + adminUser + "]";
+                ", orgLogoUrl=" + orgLogoUrl + "]";
     }
 }

@@ -15,7 +15,6 @@ public class AdminExperienceResponseDTO {
     private String locationType;
     private String description;
     private String companyLogoUrl;
-    private String adminUser;
 
     public AdminExperienceResponseDTO() {
 
@@ -25,7 +24,7 @@ public class AdminExperienceResponseDTO {
             String company, Short startMonth, Short startYear,
             Short endMonth, Short endYear, Boolean currentlyWorking,
             String location, String locationType, String description,
-            String companyLogoUrl, String adminUser) {
+            String companyLogoUrl) {
 
         this.id = id;
         this.title = title;
@@ -40,7 +39,6 @@ public class AdminExperienceResponseDTO {
         this.locationType = locationType;
         this.description = description;
         this.companyLogoUrl = companyLogoUrl;
-        this.adminUser = adminUser;
     }
 
     public Long getId() {
@@ -134,13 +132,6 @@ public class AdminExperienceResponseDTO {
         this.companyLogoUrl = companyLogoUrl;
     }
 
-    public String getAdminUser() {
-        return adminUser;
-    }
-    public void setAdminUser(String adminUser) {
-        this.adminUser = adminUser;
-    }
-
     @Override
     public String toString() {
         return "AdminExperienceResponseDTO [id=" + id +
@@ -156,7 +147,6 @@ public class AdminExperienceResponseDTO {
                 ", locationType=" + locationType +
                 ", description=" + description +
                 ", companyLogoUrl=" + companyLogoUrl +
-                ", adminUser=" + adminUser +
                 "]";
     }
 }

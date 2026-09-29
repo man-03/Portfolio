@@ -11,7 +11,6 @@ public class AdminProjectResponseDTO {
     private Short endMonth;
     private Short endYear;
     private String techStack;
-    private String adminUser;
 
     public AdminProjectResponseDTO() {
 
@@ -24,8 +23,7 @@ public class AdminProjectResponseDTO {
                                Short startYear,
                                Short endMonth,
                                Short endYear,
-                               String techStack,
-                               String adminUser) {
+                               String techStack) {
 
         this.id = id;
         this.title = title;
@@ -36,7 +34,6 @@ public class AdminProjectResponseDTO {
         this.endMonth = endMonth;
         this.endYear = endYear;
         this.techStack = techStack;
-        this.adminUser = adminUser;
     }
 
     public Long getId() {
@@ -102,13 +99,6 @@ public class AdminProjectResponseDTO {
         this.techStack = techStack;
     }
 
-    public String getAdminUser() {
-        return adminUser;
-    }
-    public void setAdminUser(String adminUser) {
-        this.adminUser = adminUser;
-    }
-
     @Override
     public String toString() {
         return "AdminProjectResponseDTO [id=" + id +
@@ -119,7 +109,6 @@ public class AdminProjectResponseDTO {
                 ", startYear=" + startYear +
                 ", endMonth=" + endMonth +
                 ", endYear=" + endYear +
-                ", techStack=" + techStack +
-                ", adminUser=" + adminUser + "]";
+                ", techStack=" + techStack + "]";
     }
 }

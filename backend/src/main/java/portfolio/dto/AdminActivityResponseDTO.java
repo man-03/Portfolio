@@ -5,18 +5,16 @@ public class AdminActivityResponseDTO {
     private Long id;
     private String activityDescription;
     private String activityMediaUrl;
-    private String adminUser;
 
     public AdminActivityResponseDTO() {
 
     }
 
     public AdminActivityResponseDTO(Long id, String activityDescription,
-                                    String activityMediaUrl, String adminUser) {
+                                    String activityMediaUrl) {
         this.id = id;
         this.activityDescription = activityDescription;
         this.activityMediaUrl = activityMediaUrl;
-        this.adminUser = adminUser;
     }
 
     public Long getId() {
@@ -43,19 +41,10 @@ public class AdminActivityResponseDTO {
         this.activityMediaUrl = activityMediaUrl;
     }
 
-    public String getAdminUser() {
-        return adminUser;
-    }
-
-    public void setAdminUser(String adminUser) {
-        this.adminUser = adminUser;
-    }
-
     @Override
     public String toString() {
         return "AdminActivityResponseDTO [id=" + id +
                 ", activityDescription=" + activityDescription +
-                ", activityMediaUrl=" + activityMediaUrl +
-                ", adminUser=" + adminUser + "]";
+                ", activityMediaUrl=" + activityMediaUrl + "]";
     }
 }

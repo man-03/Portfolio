@@ -5,17 +5,15 @@ public class AdminLinkResponseDTO {
     private Long id;
     private String platform;
     private String url;
-    private String adminUser;
 
     public AdminLinkResponseDTO() {
 
     }
 
-    public AdminLinkResponseDTO(Long id, String platform, String url, String adminUser) {
+    public AdminLinkResponseDTO(Long id, String platform, String url) {
         this.id = id;
         this.platform = platform;
         this.url = url;
-        this.adminUser = adminUser;
     }
 
     public Long getId() {
@@ -42,19 +40,10 @@ public class AdminLinkResponseDTO {
         this.url = url;
     }
 
-    public String getAdminUser() {
-        return adminUser;
-    }
-
-    public void setAdminUser(String adminUser) {
-        this.adminUser = adminUser;
-    }
-
     @Override
     public String toString() {
         return "AdminLinksResponseDTO [id=" + id +
                 ", platform=" + platform +
-                ", url=" + url +
-                ", adminUser=" + adminUser + "]";
+                ", url=" + url + "]";
     }
 }

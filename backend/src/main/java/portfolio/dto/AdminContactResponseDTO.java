@@ -5,17 +5,15 @@ public class AdminContactResponseDTO {
     private Long id;
     private String email;
     private String phone;
-    private String adminUser;
 
     public AdminContactResponseDTO() {
 
     }
 
-    public AdminContactResponseDTO(Long id, String email, String phone, String adminUser) {
+    public AdminContactResponseDTO(Long id, String email, String phone) {
         this.id = id;
         this.email = email;
         this.phone = phone;
-        this.adminUser = adminUser;
     }
 
     public Long getId() {
@@ -41,20 +39,11 @@ public class AdminContactResponseDTO {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    
-    public String getAdminUser() {
-    	return adminUser;
-    }
-    
-    public void setAdminUser(String adminUser) {
-    	this.adminUser = adminUser;
-    }
 
     @Override
     public String toString() {
         return "AdminContactResponseDTO [id=" + id +
                 ", email=" + email +
-                ", phone=" + phone +
-                ", adminUser=" + adminUser + "]";
+                ", phone=" + phone + "]";
     }
 }

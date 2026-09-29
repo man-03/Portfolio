@@ -224,10 +224,6 @@ public class AdminMapper {
         dto.setDescription(experience.getDescription());
         dto.setCompanyLogoUrl(experience.getCompanyLogoUrl());
 
-        if (experience.getAdmin() != null) {
-            dto.setAdminUser(experience.getAdmin().getUserName());
-        }
-
         return dto;
     }
     
@@ -271,10 +267,6 @@ public class AdminMapper {
         dto.setActivities(education.getActivities());
         dto.setSchoolLogoUrl(education.getSchoolLogoUrl());
 
-        if (education.getAdmin() != null) {
-            dto.setAdminUser(education.getAdmin().getUserName());
-        }
-
         return dto;
     }
     
@@ -307,10 +299,6 @@ public class AdminMapper {
         dto.setEndMonth(project.getEndMonth());
         dto.setEndYear(project.getEndYear());
         dto.setTechStack(project.gettechStack());
-
-        if (project.getAdmin() != null) {
-            dto.setAdminUser(project.getAdmin().getUserName());
-        }
 
         return dto;
     }
@@ -352,10 +340,6 @@ public class AdminMapper {
         dto.setLandcUrl(landc.getLandcUrl());
         dto.setOrgLogoUrl(landc.getOrgLogoUrl());
 
-        if (landc.getAdmin() != null) {
-            dto.setAdminUser(landc.getAdmin().getUserName());
-        }
-
         return dto;
     }
     
@@ -376,10 +360,6 @@ public class AdminMapper {
     	dto.setId(activity.getId());
     	dto.setActivityDescription(activity.getActivityDescription());
     	dto.setActivityMediaUrl(activity.getActivityMediaUrl());
-    	
-    	if(activity.getAdmin() != null) {
-    		dto.setAdminUser(activity.getAdmin().getUserName());
-    	}
     	
     	return dto;
     }
@@ -417,10 +397,6 @@ public class AdminMapper {
     	dto.setId(contact.getId());
     	dto.setEmail(contact.getEmail());
     	dto.setPhone(contact.getPhone());
-    	
-    	if(contact.getAdmin() != null) {
-    		dto.setAdminUser(contact.getAdmin().getUserName());
-    	}
     	
     	return dto;
     }
@@ -464,10 +440,6 @@ public class AdminMapper {
     	dto.setPlatform(link.getPlatform());
     	dto.setUrl(link.getUrl());
     	
-    	if(link.getAdmin() != null) {
-    		dto.setAdminUser(link.getAdmin().getUserName());
-    	}
-    	
     	return dto;
 	}
 	
@@ -495,10 +467,6 @@ public class AdminMapper {
 		AdminSkillsCategoryResponseDTO dto = new AdminSkillsCategoryResponseDTO();
 		dto.setId(category.getId());
 		dto.setCategory(category.getCategory());
-		
-		if(category.getAdmin() != null) {
-    		dto.setAdminUser(category.getAdmin().getUserName());
-    	}
 		
 		return dto;
 	}

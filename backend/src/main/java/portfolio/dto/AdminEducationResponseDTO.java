@@ -16,7 +16,6 @@ public class AdminEducationResponseDTO {
     private String skills;
     private String activities;
     private String schoolLogoUrl;
-    private String adminUser;
 
     public AdminEducationResponseDTO() {
 
@@ -27,8 +26,7 @@ public class AdminEducationResponseDTO {
                                 Short startYear, Short endMonth,
                                 Short endYear, String grade,
                                 String description, String skills,
-                                String activities, String schoolLogoUrl,
-                                String adminUser) {
+                                String activities, String schoolLogoUrl) {
 
         this.id = id;
         this.degree = degree;
@@ -44,7 +42,6 @@ public class AdminEducationResponseDTO {
         this.skills = skills;
         this.activities = activities;
         this.schoolLogoUrl = schoolLogoUrl;
-        this.adminUser = adminUser;
     }
 
     public Long getId() {
@@ -145,13 +142,6 @@ public class AdminEducationResponseDTO {
         this.schoolLogoUrl = schoolLogoUrl;
     }
 
-    public String getAdminUser() {
-        return adminUser;
-    }
-    public void setAdminUser(String adminUser) {
-        this.adminUser = adminUser;
-    }
-
     @Override
     public String toString() {
         return "AdminEducationResponseDTO [id=" + id +
@@ -168,7 +158,6 @@ public class AdminEducationResponseDTO {
                 ", skills=" + skills +
                 ", activities=" + activities +
                 ", schoolLogoUrl=" + schoolLogoUrl +
-                ", adminUser=" + adminUser +
                 "]";
     }
 }

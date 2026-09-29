@@ -7,7 +7,6 @@ public class AdminSkillsCategoryResponseDTO {
     private Long id;
     private String category;
     private List<AdminSkillResponseDTO> skills;
-    private String adminUser;
 
     public Long getId() {
         return id;
@@ -31,13 +30,5 @@ public class AdminSkillsCategoryResponseDTO {
 
     public void setSkills(List<AdminSkillResponseDTO> skills) {
         this.skills = skills;
-    }
-    
-    public String getAdminUser() {
-        return adminUser;
-    }
-
-    public void setAdminUser(String adminUser) {
-        this.adminUser = adminUser;
     }
 }
