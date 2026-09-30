@@ -1,5 +1,7 @@
 package portfolio.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,7 @@ public class AdminAddressController {
 //	}
 	
 	@GetMapping("/address/{adminUser}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<AdminAddressResponseDTO> getAddress(@PathVariable String userName) {
 		 AdminAddressResponseDTO response = adminAddressService.getAddress(userName);
 		 return new ResponseEntity<>(response, HttpStatus.OK);

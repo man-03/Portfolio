@@ -1,5 +1,7 @@
 package portfolio.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -29,24 +31,28 @@ public class LicenseAndCertificationController {
 	}
 	
 	@PostMapping("{userName}/credential")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> createCredential(@PathVariable String userName, @RequestBody LicenseAndCertificationRequestDTO licenseAndCertificationRequestDTO) {
 		ApiResponse response = licenseAndCertificationService.createCredential(userName, licenseAndCertificationRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{userName}/credential")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<List<LicenseAndCertificationResponseDTO>> getCredential(@PathVariable String userName) {
 		List<LicenseAndCertificationResponseDTO> response = licenseAndCertificationService.getCredential(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@PutMapping("/{userName}/credential/{credentialId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> updateCredentials(@PathVariable String userName, @PathVariable Long credentialId, @RequestBody LicenseAndCertificationRequestDTO licenseAndCertificationRequestDTO) {
 		ApiResponse response = licenseAndCertificationService.updateCredential(userName, credentialId,  licenseAndCertificationRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/credential/{credentialId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteCredential(@PathVariable Long credentialId) {
 		ApiResponse response = licenseAndCertificationService.deleteCredential(credentialId);
 		return new ResponseEntity<>(response, HttpStatus.OK);

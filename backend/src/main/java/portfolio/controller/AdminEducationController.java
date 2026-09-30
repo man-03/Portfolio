@@ -1,5 +1,7 @@
 package portfolio.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -29,24 +31,28 @@ public class AdminEducationController {
 	}
 
 	@PostMapping("/{userName}/education")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> createEducation(@PathVariable String userName, @RequestBody AdminEducationRequestDTO adminEducationRequestDTO) {
 		ApiResponse response = adminEducationService.createEducation(userName, adminEducationRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{userName}/education")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<List<AdminEducationResponseDTO>> getEducatoin(@PathVariable String userName) {
 		List<AdminEducationResponseDTO> response = adminEducationService.getEducation(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@PutMapping("/{userName}/education/{educationId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> updateEducation(@PathVariable String userName, @PathVariable Long educationId, @RequestBody AdminEducationRequestDTO adminEducationRequestDTO) {
 		ApiResponse response = adminEducationService.updateEducation(userName, educationId, adminEducationRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/education/{educationId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteEducation(@PathVariable Long educationId) {
 		ApiResponse response = adminEducationService.deleteEducation(educationId);
 		return new ResponseEntity<>(response, HttpStatus.OK);

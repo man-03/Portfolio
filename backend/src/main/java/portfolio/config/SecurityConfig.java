@@ -1,5 +1,7 @@
 package portfolio.config;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 import portfolio.service.authorizationService.JwtAuthenticationFilter;
 
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean

@@ -1,5 +1,7 @@
 package portfolio.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,23 +29,27 @@ public class AdminContactController {
 	}
 	
 	@PostMapping("/{userName}/contact")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> createContact(@PathVariable String userName, @RequestBody AdminContactRequestDTO adminContactReqestDTO) {
 		ApiResponse response = adminContactService.createContact(userName, adminContactReqestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{userName}/contact")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<AdminContactResponseDTO> getContact(@PathVariable String userName, @RequestBody AdminContactRequestDTO adminContactReqestDTO) {
 		AdminContactResponseDTO response = adminContactService.getContact(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@PutMapping("/{userName}/contact/{contactId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> updateContact(@PathVariable String userName, @PathVariable Long contactId, @RequestBody AdminContactRequestDTO adminContactReqestDTO) {
 		ApiResponse response = adminContactService.updateContact(userName, contactId, adminContactReqestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	@DeleteMapping("/contact/{contactId}")
 	public ResponseEntity<ApiResponse> deleteContact(@PathVariable Long contactId) {
 		ApiResponse response = adminContactService.deleteContact(contactId);

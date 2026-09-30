@@ -1,5 +1,7 @@
 package portfolio.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,24 +32,28 @@ public class AdminActivityController {
 	}
 	
 	@PostMapping("/{userName}/activity")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> createActivity(@PathVariable String userName, @RequestBody AdminActivityRequestDTO adminActivityRequestDTO) {
 		ApiResponse response = adminActivityService.createActivity(userName, adminActivityRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{userName}/activity")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<List<AdminActivityResponseDTO>> getActivity(@PathVariable String userName) {
 		List<AdminActivityResponseDTO> response = adminActivityService.getActivity(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@PutMapping("/{userName}/activity/{activityId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> updateActivity(@PathVariable String userName, @PathVariable Long activityId, @RequestBody Map<String, Object> requestBody) {
 		ApiResponse response = adminActivityService.updateActivity(userName, activityId, requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/activity/{activityId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteActivity(@PathVariable Long activityId) {
 		ApiResponse response = adminActivityService.deleteActivity(activityId);
 		return new ResponseEntity<>(response, HttpStatus.OK);

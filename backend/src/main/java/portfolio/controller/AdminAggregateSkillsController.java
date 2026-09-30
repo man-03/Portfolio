@@ -1,5 +1,7 @@
 package portfolio.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,7 @@ public class AdminAggregateSkillsController {
 	 * GET COMPLETE SKILLS
 	 */
 	@GetMapping("/{userName}/skills")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<AdminSkillsAggregateResponseDTO> getSkills(
 			@PathVariable String userName) {
 
@@ -38,6 +41,7 @@ public class AdminAggregateSkillsController {
 	 * CREATE COMPLETE SKILLS
 	 */
 	@PostMapping("/{userName}/skills")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<AdminSkillsAggregateResponseDTO> createSkills(
 			@PathVariable String userName,
 			@RequestBody AdminSkillsAggregateRequestDTO request) {
@@ -58,6 +62,7 @@ public class AdminAggregateSkillsController {
 	 * Removed IDs  -> Delete
 	 */
 	@PutMapping("/{userName}/skills")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<AdminSkillsAggregateResponseDTO> updateSkills(
 			@PathVariable String userName,
 			@RequestBody AdminSkillsAggregateRequestDTO request)

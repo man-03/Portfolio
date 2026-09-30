@@ -1,5 +1,7 @@
 package portfolio.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -29,24 +31,28 @@ public class AdminExperienceController {
 	}
 	
 	@PostMapping("/{userName}/experience")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> createExperience(@PathVariable String userName, @RequestBody AdminExperienceRequestDTO adminExperienceRequestDTO) {
 		ApiResponse response = adminExperienceService.createExperience(adminExperienceRequestDTO, userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{userName}/experience")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<List<AdminExperienceResponseDTO>> getAdmin(@PathVariable String userName) {
 		List<AdminExperienceResponseDTO> response = adminExperienceService.getExperience(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@PutMapping("/{userName}/experience/{experienceId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> updateExperience(@PathVariable String userName, @PathVariable Long experienceId,  @RequestBody AdminExperienceRequestDTO adminExperienceRequestDTO) {
 		ApiResponse response = adminExperienceService.undateExperience(userName, experienceId, adminExperienceRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/experience/{experienceId}")
+	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteExperience(@PathVariable Long experienceId) {
 		ApiResponse response = adminExperienceService.deleteExperience(experienceId);
 		return new ResponseEntity<>(response, HttpStatus.OK);
