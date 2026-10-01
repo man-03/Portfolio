@@ -64,6 +64,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/public/manoj").permitAll()
                         .anyRequest().authenticated()
                 )
 
