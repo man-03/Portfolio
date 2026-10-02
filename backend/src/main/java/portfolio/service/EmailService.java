@@ -19,7 +19,7 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setFrom("immanoj312@gmail.com");
+        message.setFrom("quickfolio.app@gmail.com");
         message.setTo(toEmail);
         message.setSubject("Password Reset - Portfolio");
 
@@ -35,5 +35,27 @@ public class EmailService {
         );
 
         mailSender.send(message);
+    }
+
+    public void sendContactFormEmail(
+            String name,
+            String email,
+            String message) {
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+
+        mailMessage.setFrom("quickfolio.app@gmail.com");
+        mailMessage.setTo("immanoj312@gmail.com");
+        mailMessage.setSubject("New Portfolio Contact Message");
+
+        mailMessage.setText(
+                "New message received from your portfolio.\n\n" +
+                        "Name: " + name + "\n" +
+                        "Email: " + email + "\n\n" +
+                        "Message:\n" +
+                        message
+        );
+
+        mailSender.send(mailMessage);
     }
 }
