@@ -1,13 +1,11 @@
 package portfolio.controller;
 
-import portfolio.dto.ForgotPasswordRequestDTO;
-import portfolio.dto.LoginRequestDTO;
-import portfolio.dto.LoginResponseDTO;
+import portfolio.dto.*;
 import portfolio.service.authorizationService.AuthService;
-import portfolio.dto.ResetPasswordRequestDTO;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -48,5 +46,15 @@ public class AuthController {
         return ResponseEntity.ok(
                 "Password has been reset successfully."
         );
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @RequestBody ChangePasswordRequestDTO request,
+            Authentication authentication) {
+
+        authService.changePassword(request, authentication);
+
+        return ResponseEntity.ok("Password changed successfully.");
     }
 }

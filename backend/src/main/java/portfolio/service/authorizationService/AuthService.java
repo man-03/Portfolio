@@ -9,6 +9,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import portfolio.dto.ChangePasswordRequestDTO;
+import org.springframework.security.core.Authentication;
 
 import portfolio.service.EmailService;
 
@@ -117,6 +119,31 @@ public class AuthService {
 
         adminAuth.setResetToken(null);
         adminAuth.setResetTokenExpiry(null);
+
+        adminAuthRepository.save(adminAuth);
+    }
+
+    public void changePassword(
+            ChangePasswordRequestDTO request,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        AdminAuth adminAuth = adminAuthRepository
+                .findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
+
+        if (!passwordEncoder.matches(
+                request.getCurrentPassword(),
+                adminAuth.getPasswordHash())) {
+
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        adminAuth.setPasswordHash(
+                passwordEncoder.encode(request.getNewPassword())
+        );
 
         adminAuthRepository.save(adminAuth);
     }
