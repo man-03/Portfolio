@@ -2,6 +2,8 @@ package portfolio.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "admin_auth")
 public class AdminAuth {
@@ -27,6 +29,12 @@ public class AdminAuth {
 
     @Column(nullable = false)
     private String role;
+
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
 
     public AdminAuth() {
     }
@@ -65,5 +73,21 @@ public class AdminAuth {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public LocalDateTime getResetTokenExpiry() {
+        return resetTokenExpiry;
+    }
+
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+        this.resetTokenExpiry = resetTokenExpiry;
     }
 }

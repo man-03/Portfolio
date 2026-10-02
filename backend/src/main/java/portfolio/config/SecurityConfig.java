@@ -64,7 +64,9 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/public/manoj").permitAll()
+                        .requestMatchers("/api/auth/forgot-password").permitAll()
+                        .requestMatchers("/api/auth/reset-forgot-password").permitAll()
+                        .requestMatchers("/api/public/{userName}").permitAll()
                         .anyRequest().authenticated()
                 )
 

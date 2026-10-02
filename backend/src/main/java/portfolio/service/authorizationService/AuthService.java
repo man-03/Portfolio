@@ -2,12 +2,19 @@ package portfolio.service.authorizationService;
 
 import portfolio.dto.LoginRequestDTO;
 import portfolio.dto.LoginResponseDTO;
+import portfolio.dto.ResetPasswordRequestDTO;
 import portfolio.model.AdminAuth;
 import portfolio.repository.AdminAuthRepository;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import portfolio.service.EmailService;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Service
 public class AuthService {
@@ -15,15 +22,21 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final AdminAuthRepository adminAuthRepository;
     private final JwtService jwtService;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthService(
             AuthenticationManager authenticationManager,
             AdminAuthRepository adminAuthRepository,
-            JwtService jwtService) {
+            JwtService jwtService,
+            EmailService emailService,
+            PasswordEncoder passwordEncoder) {
 
         this.authenticationManager = authenticationManager;
         this.adminAuthRepository = adminAuthRepository;
         this.jwtService = jwtService;
+        this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public LoginResponseDTO login(LoginRequestDTO request) {
@@ -47,5 +60,64 @@ public class AuthService {
         String userName = adminAuth.getAdmin().getUserName();
 
         return new LoginResponseDTO(token, userName);
+    }
+
+    public void generateResetToken(String email) {
+
+        AdminAuth adminAuth = adminAuthRepository
+                .findByEmail(email)
+                .orElse(null);
+
+        if (adminAuth == null) {
+            return;
+        }
+
+        SecureRandom secureRandom = new SecureRandom();
+
+        byte[] tokenBytes = new byte[32];
+        secureRandom.nextBytes(tokenBytes);
+
+        String resetToken = Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(tokenBytes);
+
+        adminAuth.setResetToken(resetToken);
+        adminAuth.setResetTokenExpiry(
+                LocalDateTime.now().plusMinutes(15)
+        );
+
+        adminAuthRepository.save(adminAuth);
+
+        String resetLink =
+                "http://localhost:3000/reset-password?token="
+                        + resetToken;
+
+        emailService.sendPasswordResetEmail(
+                adminAuth.getEmail(),
+                resetLink
+        );
+    }
+
+    public void resetForgotPassword(ResetPasswordRequestDTO request) {
+
+        AdminAuth adminAuth = adminAuthRepository
+                .findByResetToken(request.getToken())
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid reset token"));
+
+        if (adminAuth.getResetTokenExpiry() == null ||
+                adminAuth.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+
+            throw new RuntimeException("Reset token has expired");
+        }
+
+        adminAuth.setPasswordHash(
+                passwordEncoder.encode(request.getNewPassword())
+        );
+
+        adminAuth.setResetToken(null);
+        adminAuth.setResetTokenExpiry(null);
+
+        adminAuthRepository.save(adminAuth);
     }
 }

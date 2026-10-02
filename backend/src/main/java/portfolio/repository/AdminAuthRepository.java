@@ -10,4 +10,6 @@ public interface AdminAuthRepository extends JpaRepository<AdminAuth, Long> {
     Optional<AdminAuth> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    Optional<AdminAuth> findByResetToken(String resetToken);
 }
