@@ -13,6 +13,7 @@ public class GlobalResponseDTO {
     private List<LicenseAndCertificationResponseDTO> licenseAndCertification;
     private AdminSkillsAggregateResponseDTO skills;
     private List<AdminActivityResponseDTO> activity;
+    private AdminResumeResponseDTO resume;
 
     public GlobalResponseDTO() {
 
@@ -27,7 +28,8 @@ public class GlobalResponseDTO {
             List<AdminEducationResponseDTO> education,
             List<LicenseAndCertificationResponseDTO> licenseAndCertification,
             AdminSkillsAggregateResponseDTO skills,
-            List<AdminActivityResponseDTO> activity) {
+            List<AdminActivityResponseDTO> activity,
+            AdminResumeResponseDTO resume) {
 
         this.admin = admin;
         this.contact = contact;
@@ -38,6 +40,7 @@ public class GlobalResponseDTO {
         this.licenseAndCertification = licenseAndCertification;
         this.skills = skills;
         this.activity = activity;
+        this.resume = resume;
     }
 
     public AdminResponseDTO getAdmin() {
@@ -111,6 +114,14 @@ public class GlobalResponseDTO {
 
     public void setActivity(List<AdminActivityResponseDTO> activity) {
         this.activity = activity;
+    }
+
+    public AdminResumeResponseDTO getResume() {
+        return resume;
+    }
+
+    public void setResume(AdminResumeResponseDTO resume) {
+        this.resume = resume;
     }
 
     @Override

@@ -22,6 +22,7 @@ public class GlobalService {
     final private AdminSkillsCategoryRepository adminSkillsCategoryRepository;
     final private AdminSkillRepository adminSkillRepository;
     final private AdminActivityRepository adminActivityRepository;
+    final private AdminResumeRepository adminResumeRepository;
     final private AdminMapper adminMapper;
 
     public GlobalService(AdminRepository adminRepository, AdminAddressRepository adminAddressRepository, AdminContactRepository adminContactRepository,
@@ -29,7 +30,7 @@ public class GlobalService {
                          AdminProjectRepository adminProjectRepository, AdminEducationRepository adminEducationRepository,
                          LicenseAndCertificationRepository licenseAndCertificationRepository, AdminSkillsCategoryRepository adminSkillsCategoryRepository,
                          AdminSkillRepository adminSkillRepository, AdminActivityRepository adminActivityRepository,
-                         AdminMapper adminMapper) {
+                         AdminMapper adminMapper, AdminResumeRepository adminResumeRepository) {
         this.adminRepository = adminRepository;
         this.adminAddressRepository = adminAddressRepository;
         this.adminContactRepository = adminContactRepository;
@@ -42,6 +43,7 @@ public class GlobalService {
         this.adminSkillRepository = adminSkillRepository;
         this.adminActivityRepository = adminActivityRepository;
         this.adminMapper = adminMapper;
+        this.adminResumeRepository = adminResumeRepository;
     }
 
     public GlobalResponseDTO userOnLoad(String userName) {
@@ -97,6 +99,17 @@ public class GlobalService {
         AdminSkillsAggregateResponseDTO adminSkillsAggregateResponseDTO = new AdminSkillsAggregateResponseDTO();
         adminSkillsAggregateResponseDTO.setCategories(categoryDTOs);
 
+        AdminResumeResponseDTO resumeResponse = adminResumeRepository
+                .findByAdminUserName(userName)
+                .map(adminResume -> new AdminResumeResponseDTO(
+                        adminResume.getId(),
+                        adminResume.getFileName(),
+                        adminResume.getContentType(),
+                        adminResume.getFileSize(),
+                        adminResume.getUploadedAt()
+                ))
+                .orElse(null);
+
 
         globalResponseDTO.setAdmin(adminResponseDTO);
         globalResponseDTO.setContact(adminContactResponseDTO);
@@ -107,7 +120,16 @@ public class GlobalService {
         globalResponseDTO.setLicenseAndCertification(licenseAndCertificationResponseDTOS);
         globalResponseDTO.setSkills(adminSkillsAggregateResponseDTO);
         globalResponseDTO.setActivity(adminActivityResponseDTOS);
+        globalResponseDTO.setResume(resumeResponse);
 
         return globalResponseDTO;
+    }
+
+    public AdminResume getResumeFile(String userName) {
+
+        return adminResumeRepository
+                .findByAdminUserName(userName)
+                .orElseThrow(() ->
+                        new RuntimeException("Resume not found"));
     }
 }
