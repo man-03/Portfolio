@@ -338,7 +338,7 @@ public class AdminMapper {
         return dto;
     }
     
-    public AdminActivity convetDTOToAdminActivity(AdminActivityRequestDTO dto) {
+    public AdminActivity convertDTOToAdminActivity(AdminActivityRequestDTO dto) {
     	
     	AdminActivity activity = new AdminActivity();
     	

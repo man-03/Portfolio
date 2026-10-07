@@ -1,15 +1,16 @@
 package portfolio.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import portfolio.dto.AdminResumeResponseDTO;
 import portfolio.model.Admin;
 import portfolio.model.AdminResume;
 import portfolio.repository.AdminRepository;
 import portfolio.repository.AdminResumeRepository;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
 
 @Service
 public class AdminResumeService {
@@ -35,9 +36,7 @@ public class AdminResumeService {
 
         validateFile(file);
 
-        AdminResume adminResume = adminResumeRepository
-                .findByAdminUserName(userName)
-                .orElse(new AdminResume());
+        AdminResume adminResume = new AdminResume();
 
         adminResume.setAdmin(admin);
         adminResume.setFileName(file.getOriginalFilename());
@@ -64,10 +63,11 @@ public class AdminResumeService {
 
     public AdminResumeResponseDTO updateResume(
             String userName,
+            Long resumeId,
             MultipartFile file) throws IOException {
 
         AdminResume adminResume = adminResumeRepository
-                .findByAdminUserName(userName)
+                .findByIdAndAdmin_UserName(resumeId, userName)
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
 
@@ -85,20 +85,24 @@ public class AdminResumeService {
         return mapToResponse(updatedResume);
     }
 
-    public void deleteResume(String userName) {
+    public void deleteResume(
+            String userName,
+            Long resumeId) {
 
         AdminResume adminResume = adminResumeRepository
-                .findByAdminUserName(userName)
+                .findByIdAndAdmin_UserName(resumeId, userName)
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
 
         adminResumeRepository.delete(adminResume);
     }
 
-    public AdminResume getResumeFile(String userName) {
+    public AdminResume getResumeFile(
+            String userName,
+            Long resumeId) {
 
         return adminResumeRepository
-                .findByAdminUserName(userName)
+                .findByIdAndAdmin_UserName(resumeId, userName)
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
     }
@@ -112,7 +116,8 @@ public class AdminResumeService {
         if (!"application/pdf".equalsIgnoreCase(
                 file.getContentType())) {
 
-            throw new RuntimeException("Only PDF files are allowed");
+            throw new RuntimeException(
+                    "Only PDF files are allowed");
         }
     }
 

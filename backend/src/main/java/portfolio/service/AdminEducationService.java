@@ -33,7 +33,7 @@ public class AdminEducationService {
 	public ApiResponse createEducation(String userName, AdminEducationRequestDTO adminEducationRequestDTO) {
 		AdminEducation education = adminMapper.convertDTOToAdminEducation(adminEducationRequestDTO);
 		Admin admin = adminRepository.findByUserName(userName)
-				.orElseThrow(() -> new RuntimeException("Activity Not Found"));
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		education.setAdmin(admin);
 		adminEducationRepository.save(education);
 		return new ApiResponse("True", "Education Saved Successfully");
@@ -58,11 +58,11 @@ public class AdminEducationService {
 	}
 	
 	@Transactional
-	public ApiResponse deleteEducation(Long educationId) {
-		AdminEducation education = adminEducationRepository.findById(educationId)
-				.orElseThrow(() -> new RuntimeException("Eduction Not Found"));
+	public ApiResponse deleteEducation(String userName, Long educationId) {
+		AdminEducation education = adminEducationRepository.findByIdAndAdmin_UserName(educationId, userName)
+				.orElseThrow(() -> new RuntimeException("Education Not Found"));
 		adminEducationRepository.delete(education);
-		return new ApiResponse("True", "Education Updated Successfully");
+		return new ApiResponse("True", "Education Deleted Successfully");
 	}
 	
 	

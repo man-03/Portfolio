@@ -47,15 +47,15 @@ public class AdminLinkController {
 	
 	@PutMapping("{userName}/link/{linkId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> createLink(@PathVariable String userName, @PathVariable Long linkId, @RequestBody Map<String, Object> requestBody) {
+	public ResponseEntity<ApiResponse> updateLink(@PathVariable String userName, @PathVariable Long linkId, @RequestBody Map<String, Object> requestBody) {
 		ApiResponse response = adminLinkService.updateLink(userName, linkId, requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/link/{linkId}")
+	@DeleteMapping("{userName}/link/{linkId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> createLink(@PathVariable Long linkId) {
-		ApiResponse response = adminLinkService.deleteLink(linkId);
+	public ResponseEntity<ApiResponse> deleteLink(@PathVariable String userName, @PathVariable Long linkId) {
+		ApiResponse response = adminLinkService.deleteLink(userName, linkId);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 		

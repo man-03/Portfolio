@@ -21,17 +21,17 @@ public class AdminActivityService {
 	private final AdminRepository adminRepository;
 	private final AdminMapper adminMapper;
 	
-	public AdminActivityService(AdminActivityRepository adminActivityRepository, AdminRepository adminRepositor, AdminMapper adminMapper) {
+	public AdminActivityService(AdminActivityRepository adminActivityRepository, AdminRepository adminRepository, AdminMapper adminMapper) {
 		this.adminActivityRepository = adminActivityRepository;
 		this.adminMapper = adminMapper;
-		this.adminRepository = adminRepositor;
+		this.adminRepository = adminRepository;
 	}
 	
 	public ApiResponse createActivity(String userName, AdminActivityRequestDTO adminActivityRequestDTO) {
-		AdminActivity activity = adminMapper.convetDTOToAdminActivity(adminActivityRequestDTO);
+		AdminActivity activity = adminMapper.convertDTOToAdminActivity(adminActivityRequestDTO);
 		Admin admin = adminRepository.findByUserName(userName)
-				.orElseThrow(() -> new RuntimeException("Activity Not Found"));
-		activity.setAmdin(admin);
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		activity.setAdmin(admin);
 		adminActivityRepository.save(activity);
 		return new ApiResponse("True", "Activity Saved Successfully");
 	}
@@ -51,8 +51,8 @@ public class AdminActivityService {
 		return new ApiResponse("True", "Activity Updated Successfully");
 	}
 	
-	public ApiResponse deleteActivity(Long activityId) {
-		AdminActivity activity = adminActivityRepository.findById(activityId)
+	public ApiResponse deleteActivity(String userName, Long activityId) {
+		AdminActivity activity = adminActivityRepository.findByIdAndAdmin_UserName(activityId, userName)
 		.orElseThrow(() -> new RuntimeException("Activity Not Found"));;
 		adminActivityRepository.delete(activity);
 		return new ApiResponse("True", "Activity Deleted Successfully");

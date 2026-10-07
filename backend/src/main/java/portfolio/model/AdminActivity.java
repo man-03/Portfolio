@@ -64,7 +64,7 @@ public class AdminActivity {
 	public Admin getAdmin() {
 		return admin;
 	}
-	public void setAmdin(Admin admin) {
+	public void setAdmin(Admin admin) {
 		this.admin = admin;
 	}
 	

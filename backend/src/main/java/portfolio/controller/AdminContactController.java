@@ -24,20 +24,20 @@ public class AdminContactController {
 
 	private final AdminContactService adminContactService;
 	
-	public AdminContactController(AdminContactService adminContactservice) {
-		this.adminContactService = adminContactservice;
+	public AdminContactController(AdminContactService adminContactService) {
+		this.adminContactService = adminContactService;
 	}
 	
 	@PostMapping("/{userName}/contact")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> createContact(@PathVariable String userName, @RequestBody AdminContactRequestDTO adminContactReqestDTO) {
-		ApiResponse response = adminContactService.createContact(userName, adminContactReqestDTO);
+	public ResponseEntity<ApiResponse> createContact(@PathVariable String userName, @RequestBody AdminContactRequestDTO adminContactRequestDTO) {
+		ApiResponse response = adminContactService.createContact(userName, adminContactRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{userName}/contact")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<AdminContactResponseDTO> getContact(@PathVariable String userName, @RequestBody AdminContactRequestDTO adminContactReqestDTO) {
+	public ResponseEntity<AdminContactResponseDTO> getContact(@PathVariable String userName) {
 		AdminContactResponseDTO response = adminContactService.getContact(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -50,9 +50,9 @@ public class AdminContactController {
 	}
 
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	@DeleteMapping("/contact/{contactId}")
-	public ResponseEntity<ApiResponse> deleteContact(@PathVariable Long contactId) {
-		ApiResponse response = adminContactService.deleteContact(contactId);
+	@DeleteMapping("/{userName}/contact/{contactId}")
+	public ResponseEntity<ApiResponse> deleteContact(@PathVariable String userName, @PathVariable Long contactId) {
+		ApiResponse response = adminContactService.deleteContact(contactId, userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

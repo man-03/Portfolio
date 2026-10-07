@@ -52,10 +52,10 @@ public class AdminActivityController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/activity/{activityId}")
+	@DeleteMapping("{userName}/activity/{activityId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> deleteActivity(@PathVariable Long activityId) {
-		ApiResponse response = adminActivityService.deleteActivity(activityId);
+	public ResponseEntity<ApiResponse> deleteActivity(@PathVariable String userName, @PathVariable Long activityId) {
+		ApiResponse response = adminActivityService.deleteActivity(userName, activityId);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

@@ -32,7 +32,7 @@ public class AdminLinkService {
 	public ApiResponse createLink(String userName,  AdminLinkRequestDTO adminLinkRequestDTO) {
 		AdminLink link = adminMapper.convertDTOToAdminLink(adminLinkRequestDTO);
 		Admin admin = adminRepository.findByUserName(userName)
-				.orElseThrow(() -> new RuntimeException());
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		link.setAdmin(admin);
 		adminLinkRepository.save(link);
 		return new ApiResponse("True", "Link Saved Successfully");
@@ -48,14 +48,14 @@ public class AdminLinkService {
 	@Transactional
 	public ApiResponse updateLink(String userName, Long linkId, Map<String, Object> requestBody) {
 		AdminLink link = adminLinkRepository.findByIdAndAdmin_UserName(linkId, userName)
-				.orElseThrow(() -> new RuntimeException());
+				.orElseThrow(() -> new RuntimeException("Link Not Found"));
 		adminMapper.updateAdminLink(requestBody, link);
 		return new ApiResponse("True", "Link Updated Successfully");
 	}
 	
 	@Transactional
-	public ApiResponse deleteLink(Long linkId) {
-		AdminLink link = adminLinkRepository.findById(linkId)
+	public ApiResponse deleteLink(String userName, Long linkId) {
+		AdminLink link = adminLinkRepository.findByIdAndAdmin_UserName(linkId, userName)
 				.orElseThrow(() -> new RuntimeException("Link Not Found"));
 		adminLinkRepository.delete(link);
 		return new ApiResponse("True", "Link Deleted Successfully");

@@ -30,7 +30,7 @@ public class AdminAddressController {
 //		ApiResponse response = adminAddressService.createAddress(adminAddressRequestDTO);
 //	}
 	
-	@GetMapping("/address/{adminUser}")
+	@GetMapping("/address/{userName}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<AdminAddressResponseDTO> getAddress(@PathVariable String userName) {
 		 AdminAddressResponseDTO response = adminAddressService.getAddress(userName);

@@ -2,21 +2,19 @@ package portfolio.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import portfolio.dto.AdminSkillRequestDTO;
 import portfolio.dto.AdminSkillResponseDTO;
 import portfolio.dto.AdminSkillsAggregateRequestDTO;
 import portfolio.dto.AdminSkillsAggregateResponseDTO;
 import portfolio.dto.AdminSkillsCategoryRequestDTO;
 import portfolio.dto.AdminSkillsCategoryResponseDTO;
-import portfolio.dto.AdminSkillRequestDTO;
 import portfolio.model.Admin;
 import portfolio.model.AdminSkill;
 import portfolio.model.AdminSkillsCategory;
@@ -40,32 +38,36 @@ public class AdminAggregateSkillsService {
             AdminMapper adminMapper) {
 
         this.adminRepository = adminRepository;
-        this.adminSkillsCategoryRepository = adminSkillsCategoryRepository;
+        this.adminSkillsCategoryRepository =
+                adminSkillsCategoryRepository;
         this.adminSkillRepository = adminSkillRepository;
         this.adminMapper = adminMapper;
     }
 
-    /*
-     * GET COMPLETE SKILLS STRUCTURE
-     */
-    public AdminSkillsAggregateResponseDTO getSkills(String userName) {
+    public AdminSkillsAggregateResponseDTO getSkills(
+            String userName) {
 
-        Admin admin = adminRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+        adminRepository.findByUserName(userName)
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
 
         List<AdminSkillsCategory> categories =
-                adminSkillsCategoryRepository.findByAdmin_UserName(userName);
+                adminSkillsCategoryRepository
+                        .findByAdmin_UserName(userName);
 
         List<AdminSkillsCategoryResponseDTO> categoryDTOs =
                 categories.stream()
                         .map(category -> {
 
                             AdminSkillsCategoryResponseDTO categoryDTO =
-                                    adminMapper.convertAdminSkillsCategoryToDTO(category);
+                                    adminMapper
+                                            .convertAdminSkillsCategoryToDTO(
+                                                    category);
 
                             List<AdminSkillResponseDTO> skillDTOs =
                                     adminSkillRepository
-                                            .findByAdminSkillsCategory_Id(category.getId())
+                                            .findByAdminSkillsCategory_Id(
+                                                    category.getId())
                                             .stream()
                                             .map(adminMapper::convertAdminSkillToDTO)
                                             .toList();
@@ -84,26 +86,26 @@ public class AdminAggregateSkillsService {
         return response;
     }
 
-    /*
-     * CREATE COMPLETE SKILLS STRUCTURE
-     */
     @Transactional
     public AdminSkillsAggregateResponseDTO createSkills(
             String userName,
             AdminSkillsAggregateRequestDTO request) {
 
         Admin admin = adminRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
 
         if (request.getCategories() == null) {
-            throw new RuntimeException("Categories cannot be null");
+            throw new RuntimeException(
+                    "Categories cannot be null");
         }
 
         for (AdminSkillsCategoryRequestDTO categoryDTO
                 : request.getCategories()) {
 
             AdminSkillsCategory category =
-                    adminMapper.convertDTOToAdminSkillsCategory(categoryDTO);
+                    adminMapper.convertDTOToAdminSkillsCategory(
+                            categoryDTO);
 
             category.setAdmin(admin);
 
@@ -116,11 +118,9 @@ public class AdminAggregateSkillsService {
                         : categoryDTO.getSkills()) {
 
                     AdminSkill skill =
-                            adminMapper.convertDTOToAdminSkill(skillDTO);
+                            adminMapper.convertDTOToAdminSkill(
+                                    skillDTO);
 
-                    /*
-                     * AdminSkill belongs to AdminSkillsCategory.
-                     */
                     skill.setAdminSkillsCategory(category);
 
                     adminSkillRepository.save(skill);
@@ -131,13 +131,6 @@ public class AdminAggregateSkillsService {
         return getSkills(userName);
     }
 
-    /*
-     * UPDATE COMPLETE SKILLS STRUCTURE
-     *
-     * Existing ID  -> UPDATE
-     * No ID         -> CREATE
-     * Missing DB ID -> DELETE
-     */
     @Transactional
     public AdminSkillsAggregateResponseDTO updateSkills(
             String userName,
@@ -145,17 +138,13 @@ public class AdminAggregateSkillsService {
             throws JsonProcessingException {
 
         Admin admin = adminRepository.findByUserName(userName)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
 
         List<AdminSkillsCategory> existingCategories =
-                adminSkillsCategoryRepository.findByAdmin_UserName(userName);
+                adminSkillsCategoryRepository
+                        .findByAdmin_UserName(userName);
 
-        /*
-         * Keep track of category IDs received from UI.
-         *
-         * Any existing category ID that is NOT present here
-         * must be deleted.
-         */
         Set<Long> receivedCategoryIds = new HashSet<>();
 
         if (request.getCategories() != null) {
@@ -165,11 +154,9 @@ public class AdminAggregateSkillsService {
 
                 AdminSkillsCategory category;
 
-                /*
-                 * EXISTING CATEGORY
-                 */
                 if (categoryDTO.getId() != null) {
 
+                    // categoryId + userName
                     category =
                             adminSkillsCategoryRepository
                                     .findByIdAndAdmin_UserName(
@@ -181,51 +168,38 @@ public class AdminAggregateSkillsService {
 
                     receivedCategoryIds.add(category.getId());
 
-                    /*
-                     * Update category using ObjectMapper
-                     */
                     adminMapper.updateAdminSkillsCategory(
                             categoryDTO,
                             category);
-                }
 
-                /*
-                 * NEW CATEGORY
-                 */
-                else {
+                } else {
 
                     category =
-                            adminMapper.convertDTOToAdminSkillsCategory(
-                                    categoryDTO);
+                            adminMapper
+                                    .convertDTOToAdminSkillsCategory(
+                                            categoryDTO);
 
                     category.setAdmin(admin);
 
                     category =
-                            adminSkillsCategoryRepository.save(category);
+                            adminSkillsCategoryRepository
+                                    .save(category);
 
                     receivedCategoryIds.add(category.getId());
                 }
 
-                /*
-                 * Reconcile skills inside this category.
-                 */
                 updateSkillsInsideCategory(
                         category,
                         categoryDTO);
             }
         }
 
-        /*
-         * DELETE CATEGORIES REMOVED FROM UI
-         */
-        for (AdminSkillsCategory existingCategory : existingCategories) {
+        for (AdminSkillsCategory existingCategory
+                : existingCategories) {
 
-            if (!receivedCategoryIds.contains(existingCategory.getId())) {
+            if (!receivedCategoryIds.contains(
+                    existingCategory.getId())) {
 
-                /*
-                 * Delete skills first because AdminSkill has
-                 * foreign key -> AdminSkillsCategory.
-                 */
                 List<AdminSkill> existingSkills =
                         adminSkillRepository
                                 .findByAdminSkillsCategory_Id(
@@ -233,16 +207,14 @@ public class AdminAggregateSkillsService {
 
                 adminSkillRepository.deleteAll(existingSkills);
 
-                adminSkillsCategoryRepository.delete(existingCategory);
+                adminSkillsCategoryRepository
+                        .delete(existingCategory);
             }
         }
 
         return getSkills(userName);
     }
 
-    /*
-     * RECONCILE SKILLS INSIDE ONE CATEGORY
-     */
     private void updateSkillsInsideCategory(
             AdminSkillsCategory category,
             AdminSkillsCategoryRequestDTO categoryDTO)
@@ -253,12 +225,6 @@ public class AdminAggregateSkillsService {
                         .findByAdminSkillsCategory_Id(
                                 category.getId());
 
-        /*
-         * IDs of skills received from UI.
-         *
-         * Existing DB skill IDs not present here
-         * will be deleted.
-         */
         Set<Long> receivedSkillIds = new HashSet<>();
 
         if (categoryDTO.getSkills() != null) {
@@ -266,11 +232,9 @@ public class AdminAggregateSkillsService {
             for (AdminSkillRequestDTO skillDTO
                     : categoryDTO.getSkills()) {
 
-                /*
-                 * EXISTING SKILL
-                 */
                 if (skillDTO.getId() != null) {
 
+                    // skillId + categoryId
                     AdminSkill skill =
                             adminSkillRepository
                                     .findByIdAndAdminSkillsCategory_Id(
@@ -282,29 +246,14 @@ public class AdminAggregateSkillsService {
 
                     receivedSkillIds.add(skill.getId());
 
-                    /*
-                     * Update using your existing
-                     * Map<String,Object> + ObjectMapper
-                     * approach is separate from this aggregate DTO.
-                     *
-                     * Here we directly update the DTO-backed entity.
-                     */
                     skill.setSkill(skillDTO.getSkill());
-                }
 
-                /*
-                 * NEW SKILL
-                 */
-                else {
+                } else {
 
                     AdminSkill skill =
                             adminMapper.convertDTOToAdminSkill(
                                     skillDTO);
 
-                    /*
-                     * IMPORTANT:
-                     * AdminSkill has NO Admin field.
-                     */
                     skill.setAdminSkillsCategory(category);
 
                     adminSkillRepository.save(skill);
@@ -312,12 +261,10 @@ public class AdminAggregateSkillsService {
             }
         }
 
-        /*
-         * DELETE SKILLS REMOVED FROM UI
-         */
         for (AdminSkill existingSkill : existingSkills) {
 
-            if (!receivedSkillIds.contains(existingSkill.getId())) {
+            if (!receivedSkillIds.contains(
+                    existingSkill.getId())) {
 
                 adminSkillRepository.delete(existingSkill);
             }

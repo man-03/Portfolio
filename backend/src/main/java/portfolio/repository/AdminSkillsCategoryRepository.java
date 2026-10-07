@@ -13,6 +13,6 @@ public interface AdminSkillsCategoryRepository extends JpaRepository<AdminSkills
 	List<AdminSkillsCategory> findByAdmin_UserName(String userName);
 
     Optional<AdminSkillsCategory> findByIdAndAdmin_UserName(
-            Long id,
+            Long categoryId,
             String userName);
 }

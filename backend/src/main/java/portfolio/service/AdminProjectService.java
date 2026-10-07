@@ -33,7 +33,7 @@ public class AdminProjectService {
 	public ApiResponse createProject(AdminProjectRequestDTO adminProjectRequestDTO, String userName) {
 		AdminProject project = adminMapper.convertDTOToAdminProject(adminProjectRequestDTO);
 		Admin admin = adminRepository.findByUserName(userName)
-				.orElseThrow(() -> new RuntimeException("Activity Not Found"));
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		project.setAdmin(admin);
 		adminProjectRepository.save(project);
 		return new ApiResponse("True", "Project Saved Successfully");	
@@ -51,12 +51,12 @@ public class AdminProjectService {
 		AdminProject project = adminProjectRepository.findByIdAndAdmin_UserName(projectId, userName)
 				.orElseThrow(() -> new RuntimeException("Project Not Found"));
 		projectUpdateMapper.updateProject(adminProjectRequestDTO, project);
-		return new ApiResponse("True", "Project Updates Successfully");
+		return new ApiResponse("True", "Project Updated Successfully");
 	}
 	
 	@Transactional
-	public ApiResponse deleteProject(Long projectId) {
-		AdminProject project = adminProjectRepository.findById(projectId)
+	public ApiResponse deleteProject(String userName, Long projectId) {
+		AdminProject project = adminProjectRepository.findByIdAndAdmin_UserName(projectId, userName)
 				.orElseThrow(() -> new RuntimeException("Project Not Found"));
 		adminProjectRepository.delete(project);
 		return new ApiResponse("True", "Project Deleted Successfully");

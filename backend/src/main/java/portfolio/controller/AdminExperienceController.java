@@ -39,7 +39,7 @@ public class AdminExperienceController {
 	
 	@GetMapping("/{userName}/experience")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<List<AdminExperienceResponseDTO>> getAdmin(@PathVariable String userName) {
+	public ResponseEntity<List<AdminExperienceResponseDTO>> getExperience(@PathVariable String userName) {
 		List<AdminExperienceResponseDTO> response = adminExperienceService.getExperience(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -47,14 +47,14 @@ public class AdminExperienceController {
 	@PutMapping("/{userName}/experience/{experienceId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> updateExperience(@PathVariable String userName, @PathVariable Long experienceId,  @RequestBody AdminExperienceRequestDTO adminExperienceRequestDTO) {
-		ApiResponse response = adminExperienceService.undateExperience(userName, experienceId, adminExperienceRequestDTO);
+		ApiResponse response = adminExperienceService.updateExperience(userName, experienceId, adminExperienceRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/experience/{experienceId}")
+	@DeleteMapping("{userName}/experience/{experienceId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> deleteExperience(@PathVariable Long experienceId) {
-		ApiResponse response = adminExperienceService.deleteExperience(experienceId);
+	public ResponseEntity<ApiResponse> deleteExperience(@PathVariable String userName, @PathVariable Long experienceId) {
+		ApiResponse response = adminExperienceService.deleteExperience(userName, experienceId);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

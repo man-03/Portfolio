@@ -46,15 +46,15 @@ public class LicenseAndCertificationController {
 	
 	@PutMapping("/{userName}/credential/{credentialId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> updateCredentials(@PathVariable String userName, @PathVariable Long credentialId, @RequestBody LicenseAndCertificationRequestDTO licenseAndCertificationRequestDTO) {
+	public ResponseEntity<ApiResponse> updateCredential(@PathVariable String userName, @PathVariable Long credentialId, @RequestBody LicenseAndCertificationRequestDTO licenseAndCertificationRequestDTO) {
 		ApiResponse response = licenseAndCertificationService.updateCredential(userName, credentialId,  licenseAndCertificationRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/credential/{credentialId}")
+	@DeleteMapping("{userName}/credential/{credentialId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> deleteCredential(@PathVariable Long credentialId) {
-		ApiResponse response = licenseAndCertificationService.deleteCredential(credentialId);
+	public ResponseEntity<ApiResponse> deleteCredential(@PathVariable String userName, @PathVariable Long credentialId) {
+		ApiResponse response = licenseAndCertificationService.deleteCredential(userName, credentialId);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

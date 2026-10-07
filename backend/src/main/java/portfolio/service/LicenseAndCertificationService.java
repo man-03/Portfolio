@@ -34,7 +34,7 @@ public class LicenseAndCertificationService {
 	public ApiResponse createCredential(String userName, LicenseAndCertificationRequestDTO licenseAndCertificationRequestDTO) {
 		LicenseAndCertification credential = adminMapper.convertDTOToLicenseAndCertification(licenseAndCertificationRequestDTO);
 		Admin admin = adminRepository.findByUserName(userName)
-				.orElseThrow(() -> new RuntimeException("Activity Not Found"));
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		credential.setAdmin(admin);
 		licenseAndCertificationRepository.save(credential);
 		return new ApiResponse("True", "Credential Saved Successfully");
@@ -49,16 +49,16 @@ public class LicenseAndCertificationService {
 	
 	@Transactional
 	public ApiResponse updateCredential(String userName, Long credentialId, LicenseAndCertificationRequestDTO licenseAndCertificationRequestDTO) {
-		LicenseAndCertification credentail = licenseAndCertificationRepository.findByIdAndAdmin_UserName(credentialId, userName)
-				.orElseThrow(() -> new RuntimeException("Crednetial Not Found"));
-		licenseAndCertificationUpdateMapper.updateLicenseAndCertification(licenseAndCertificationRequestDTO, credentail);
+		LicenseAndCertification credential = licenseAndCertificationRepository.findByIdAndAdmin_UserName(credentialId, userName)
+				.orElseThrow(() -> new RuntimeException("Credential Not Found"));
+		licenseAndCertificationUpdateMapper.updateLicenseAndCertification(licenseAndCertificationRequestDTO, credential);
 		return new ApiResponse("True", "Credential Updated Successfully");
 	}
 	
 	@Transactional
-	public ApiResponse deleteCredential(Long credentialId) {
-		LicenseAndCertification credential = licenseAndCertificationRepository.findById(credentialId)
-				.orElseThrow(() -> new RuntimeException("Crednetial Not Found"));
+	public ApiResponse deleteCredential(String userName, Long credentialId) {
+		LicenseAndCertification credential = licenseAndCertificationRepository.findByIdAndAdmin_UserName(credentialId, userName)
+				.orElseThrow(() -> new RuntimeException("Credential Not Found"));
 		licenseAndCertificationRepository.delete(credential);
 		return new ApiResponse("True", "Credential Deleted Successfully");
 	}

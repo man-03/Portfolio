@@ -39,7 +39,7 @@ public class AdminEducationController {
 	
 	@GetMapping("/{userName}/education")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<List<AdminEducationResponseDTO>> getEducatoin(@PathVariable String userName) {
+	public ResponseEntity<List<AdminEducationResponseDTO>> getEducation(@PathVariable String userName) {
 		List<AdminEducationResponseDTO> response = adminEducationService.getEducation(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -51,10 +51,10 @@ public class AdminEducationController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/education/{educationId}")
+	@DeleteMapping("{userName}/education/{educationId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
-	public ResponseEntity<ApiResponse> deleteEducation(@PathVariable Long educationId) {
-		ApiResponse response = adminEducationService.deleteEducation(educationId);
+	public ResponseEntity<ApiResponse> deleteEducation(@PathVariable String userName, @PathVariable Long educationId) {
+		ApiResponse response = adminEducationService.deleteEducation(userName, educationId);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

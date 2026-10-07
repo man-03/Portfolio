@@ -17,7 +17,7 @@ public class AdminContactService {
 
 	private final AdminContactRepository adminContactRepository;
 	private final AdminRepository adminRepository;
-	private AdminMapper adminMapper;
+	private final AdminMapper adminMapper;
 	
 	public AdminContactService(AdminContactRepository adminContactRepository, AdminRepository adminRepository, AdminMapper adminMapper) {
 		this.adminContactRepository = adminContactRepository;
@@ -49,10 +49,10 @@ public class AdminContactService {
 	}
 	
 	@Transactional
-	public ApiResponse deleteContact(Long contactId) {
-		AdminContact contact = adminContactRepository.findById(contactId)
-				.orElseThrow(() -> new RuntimeException("Contact Not Found"));
+	public ApiResponse deleteContact(Long contactId, String userName) {
+		AdminContact contact = adminContactRepository.findByIdAndAdmin_UserName(contactId, userName)
+                .orElseThrow(() -> new RuntimeException("Contact Not Found"));
 		adminContactRepository.delete(contact);
-		return new ApiResponse("True", "Contact Updated Successfully");
+		return new ApiResponse("True", "Contact Deleted Successfully");
 	}
 }

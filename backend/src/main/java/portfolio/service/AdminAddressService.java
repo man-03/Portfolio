@@ -38,7 +38,7 @@ public class AdminAddressService {
 	
 	public ApiResponse updateAddress(AdminAddressRequestDTO adminAddressRequestDTO, String userName) {
 		AdminAddress address = adminAddressRepository.findByAdmin_UserName(userName)
-				.orElseThrow(() -> new RuntimeException("Addres Not Found"));
+				.orElseThrow(() -> new RuntimeException("Address Not Found"));
 		adminMapper.updateAddress(adminAddressRequestDTO, address);
 		adminAddressRepository.save(address);
 		return new ApiResponse("True", "Address Updated Successfully");
@@ -47,7 +47,7 @@ public class AdminAddressService {
 	@Transactional
 	public ApiResponse deleteAddress(Long addressId) {
 		AdminAddress address = adminAddressRepository.findById(addressId)
-				.orElseThrow(() -> new RuntimeException("Activity Not Found"));;
+				.orElseThrow(() -> new RuntimeException("Address Not Found"));;
 		adminAddressRepository.delete(address);
 		return new ApiResponse("Success", "Address Deleted Successfully");
 	}

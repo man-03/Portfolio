@@ -35,7 +35,7 @@ public class AdminExperienceService {
 	public ApiResponse createExperience(AdminExperienceRequestDTO adminExperienceRequestDTO, String userName) {
 		AdminExperience experience = adminMapper.convertDTOToAdminExperience(adminExperienceRequestDTO);
 		Admin admin = adminRepository.findByUserName(userName)
-				.orElseThrow(() -> new RuntimeException("Activity Not Found"));
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		experience.setAdmin(admin);
 		adminExperienceRepository.save(experience);
 		return new ApiResponse("True", "Experience Saved Successfully");
@@ -48,7 +48,7 @@ public class AdminExperienceService {
 	        .toList();
 	}
 	
-	public ApiResponse undateExperience(String userName, Long experienceId, AdminExperienceRequestDTO adminExperienceRequestDTO) {
+	public ApiResponse updateExperience(String userName, Long experienceId, AdminExperienceRequestDTO adminExperienceRequestDTO) {
 		AdminExperience experience = adminExperienceRepository.findByIdAndAdmin_UserName(experienceId, userName)
 				.orElseThrow(() -> new RuntimeException("Experience Not Found"));
 		experienceUpdateMapper.updateExperience(adminExperienceRequestDTO, experience);
@@ -61,8 +61,8 @@ public class AdminExperienceService {
 	}
 	
 	@Transactional
-	public ApiResponse deleteExperience(Long experienceId) {
-		AdminExperience experience = adminExperienceRepository.findById(experienceId)
+	public ApiResponse deleteExperience(String userName, Long experienceId) {
+		AdminExperience experience = adminExperienceRepository.findByIdAndAdmin_UserName(experienceId, userName)
 	            .orElseThrow(() -> new RuntimeException("Experience Not Found"));
 	    adminExperienceRepository.delete(experience);
 		return new ApiResponse("True", "Experience Deleted Successfully");
