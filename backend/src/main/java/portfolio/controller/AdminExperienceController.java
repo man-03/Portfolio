@@ -51,7 +51,7 @@ public class AdminExperienceController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("{userName}/experience/{experienceId}")
+	@DeleteMapping("/{userName}/experience/{experienceId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteExperience(@PathVariable String userName, @PathVariable Long experienceId) {
 		ApiResponse response = adminExperienceService.deleteExperience(userName, experienceId);

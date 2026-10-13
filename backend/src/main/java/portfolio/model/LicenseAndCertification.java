@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="license_and_certification")
+@Table(name="admin_license_and_certification")
 public class LicenseAndCertification {
 
 	@Id
@@ -48,9 +48,9 @@ public class LicenseAndCertification {
 	
 	@Column(name="org_logo_url")
 	private String orgLogoUrl;
-	
-	@ManyToOne
-    @JoinColumn(name="admin_user")
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "admin_profile_id", nullable = false)
     private Admin admin;
 	
 	public LicenseAndCertification() {

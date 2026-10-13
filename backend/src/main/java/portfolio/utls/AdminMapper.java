@@ -58,7 +58,6 @@ public class AdminMapper {
 
         Admin admin = new Admin();
 
-        admin.setUserName(dto.getUserName());
         admin.setFirstName(dto.getFirstName());
         admin.setLastName(dto.getLastName());
         admin.setDateOfBirth(dto.getDateOfBirth());
@@ -76,7 +75,7 @@ public class AdminMapper {
 
         AdminResponseDTO dto = new AdminResponseDTO();
 
-        dto.setUserName(admin.getUserName());
+        dto.setId(admin.getId());
         dto.setFirstName(admin.getFirstName());
         dto.setLastName(admin.getLastName());
         dto.setDateOfBirth(admin.getDateOfBirth());
@@ -293,7 +292,7 @@ public class AdminMapper {
         dto.setStartYear(project.getStartYear());
         dto.setEndMonth(project.getEndMonth());
         dto.setEndYear(project.getEndYear());
-        dto.setTechStack(project.gettechStack());
+        dto.setTechStack(project.getTechStack());
 
         return dto;
     }
@@ -405,7 +404,7 @@ public class AdminMapper {
     		
     		String property = pd.getName();
     		
-    		if("class".equals("property")) {
+    		if("class".equals(property)) {
     			continue;
     		}
     		

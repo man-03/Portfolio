@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 public class AdminRequestDTO {
 
-    private String userName;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
@@ -14,17 +13,15 @@ public class AdminRequestDTO {
     private String headLine;
     private String about;
     private String profileImageUrl;
-    private String password;
     private AdminAddressRequestDTO adminAddressRequestDTO;
 
     public AdminRequestDTO() {
 
     }
 
-    public AdminRequestDTO(String userName, String firstName, String lastName, LocalDate dateOfBirth, String pronoun,
-                    String currentPosition, String myQuote, String headLine, String about, String profileImageUrl, String password, AdminAddressRequestDTO adminAddressRequestDTO) {
+    public AdminRequestDTO(String firstName, String lastName, LocalDate dateOfBirth, String pronoun,
+                    String currentPosition, String myQuote, String headLine, String about, String profileImageUrl, AdminAddressRequestDTO adminAddressRequestDTO) {
 
-        this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -34,16 +31,7 @@ public class AdminRequestDTO {
         this.headLine = headLine;
         this.about = about;
         this.profileImageUrl = profileImageUrl;
-        this.password = password;
         this.adminAddressRequestDTO = adminAddressRequestDTO;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public String getFirstName() {
@@ -118,26 +106,17 @@ public class AdminRequestDTO {
     	this.profileImageUrl = profileImageUrl;
     }
     
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    
     public AdminAddressRequestDTO getAdminAddressRequestDTO() {
         return adminAddressRequestDTO;
     }
 
-    public void setAdminAddress(AdminAddressRequestDTO adminAddressRequestDTO) {
+    public void setAdminAddressRequestDTO(AdminAddressRequestDTO adminAddressRequestDTO) {
         this.adminAddressRequestDTO = adminAddressRequestDTO;
     }
 
     @Override
     public String toString() {
-        return "AdminDTO [userName = " + userName +
-                ", firstName = " + firstName +
+        return "AdminDTO [firstName = " + firstName +
                 ", lastName = " + lastName +
                 ", dateOfBirth = " + dateOfBirth +
                 ", pronoun = " + pronoun +

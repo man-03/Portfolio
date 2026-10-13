@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 import portfolio.model.AdminProject;
 
 @Repository
-public interface AdminProjectRepository extends JpaRepository<AdminProject, Long>{
-	
-	List<AdminProject> findByAdmin_UserName(String userName);
-	Optional<AdminProject> findByIdAndAdmin_UserName(Long projectId, String userName);
+public interface AdminProjectRepository extends JpaRepository<AdminProject, Long> {
+
+	List<AdminProject> findByAdmin_Id(Long adminProfileId);
+	Optional<AdminProject> findByIdAndAdmin_Id(Long projectId, Long adminProfileId);
 }

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class AdminResponseDTO {
 
-    private String userName;
+    private Long id;
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
@@ -20,10 +20,10 @@ public class AdminResponseDTO {
 
     }
 
-    public AdminResponseDTO(String userName, String firstName, String lastName, LocalDate dateOfBirth, String pronoun,
+    public AdminResponseDTO(long id, String firstName, String lastName, LocalDate dateOfBirth, String pronoun,
                     String currentPosition, String myQuote, String headLine, String about, String profileImageUrl, AdminAddressResponseDTO adminAddressResponseDTO) {
 
-        this.userName = userName;
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -36,12 +36,12 @@ public class AdminResponseDTO {
         this.adminAddressResponseDTO = adminAddressResponseDTO;
     }
 
-    public String getUserName() {
-        return userName;
+    public Long getId() {
+        return id;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFirstName() {
@@ -126,7 +126,7 @@ public class AdminResponseDTO {
 
     @Override
     public String toString() {
-        return "AdminDTO [userName = " + userName +
+        return "AdminDTO [id = " + id +
                 ", firstName = " + firstName +
                 ", lastName = " + lastName +
                 ", dateOfBirth = " + dateOfBirth +

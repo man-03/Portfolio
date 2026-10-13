@@ -28,8 +28,9 @@ public class AdminAddress {
 	private String city;
 	@Column(name="zip")
 	private String zip;
-	@OneToOne
-	@JoinColumn(name="admin_user")
+
+	@OneToOne(optional = false)
+	@JoinColumn(name = "admin_profile_id", nullable = false, unique = true)
 	private Admin admin;
 	
 	public AdminAddress() {

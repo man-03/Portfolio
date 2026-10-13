@@ -24,10 +24,10 @@ public class AdminLink {
 	
 	@Column(name="url")
 	private String url;
-	
-	@ManyToOne
-	@JoinColumn(name="admin_user")
-	private Admin admin;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "admin_profile_id", nullable = false)
+    private Admin admin;
 	
 	public AdminLink() {
 		

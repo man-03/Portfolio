@@ -42,9 +42,9 @@ public class AdminProject {
 	
 	@Column(name="tech_stack")
     private String techStack;
-	
-    @ManyToOne
-    @JoinColumn(name="admin_user")
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "admin_profile_id", nullable = false)
     private Admin admin;
     
     
@@ -129,7 +129,7 @@ public class AdminProject {
         this.endYear = endYear;
     }
     
-    public String gettechStack() {
+    public String getTechStack() {
     	return techStack;
     }
     public void setTechStack(String techStack) {

@@ -11,6 +11,6 @@ import portfolio.model.LicenseAndCertification;
 @Repository
 public interface LicenseAndCertificationRepository extends JpaRepository<LicenseAndCertification, Long> {
 
-	List<LicenseAndCertification> findByAdmin_UserName(String userName);
-	Optional<LicenseAndCertification> findByIdAndAdmin_UserName(Long credentialId, String userName);
+	List<LicenseAndCertification> findByAdmin_Id(Long adminProfileId);
+	Optional<LicenseAndCertification> findByIdAndAdmin_Id(Long credentialId, Long adminProfileId);
 }

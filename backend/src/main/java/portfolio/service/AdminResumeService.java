@@ -30,7 +30,7 @@ public class AdminResumeService {
             String userName,
             MultipartFile file) throws IOException {
 
-        Admin admin = adminRepository.findById(userName)
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
                 .orElseThrow(() ->
                         new RuntimeException("Admin not found"));
 
@@ -53,8 +53,12 @@ public class AdminResumeService {
 
     public AdminResumeResponseDTO getResume(String userName) {
 
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
+
         AdminResume adminResume = adminResumeRepository
-                .findByAdminUserName(userName)
+                .findByAdmin_Id(admin.getId())
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
 
@@ -66,8 +70,12 @@ public class AdminResumeService {
             Long resumeId,
             MultipartFile file) throws IOException {
 
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
+
         AdminResume adminResume = adminResumeRepository
-                .findByIdAndAdmin_UserName(resumeId, userName)
+                .findByIdAndAdmin_Id(resumeId, admin.getId())
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
 
@@ -89,8 +97,12 @@ public class AdminResumeService {
             String userName,
             Long resumeId) {
 
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
+
         AdminResume adminResume = adminResumeRepository
-                .findByIdAndAdmin_UserName(resumeId, userName)
+                .findByIdAndAdmin_Id(resumeId, admin.getId())
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
 
@@ -101,8 +113,12 @@ public class AdminResumeService {
             String userName,
             Long resumeId) {
 
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+                .orElseThrow(() ->
+                        new RuntimeException("Admin not found"));
+
         return adminResumeRepository
-                .findByIdAndAdmin_UserName(resumeId, userName)
+                .findByIdAndAdmin_Id(resumeId, admin.getId())
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
     }

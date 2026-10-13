@@ -3,18 +3,15 @@ package portfolio.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "admin_profile")
 public class Admin {
 
-	@Id //This field uniquely identifies a row in the database table.
-	@Column(name = "user_name")
-	private String userName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
 	@Column(name = "first_name")
 	private String firstName;
@@ -42,15 +39,19 @@ public class Admin {
 	
 	@Column(name="profile_image_url")
 	private String profileImageUrl;
+
+    @OneToOne
+    @JoinColumn(name = "admin_auth_id", nullable = false, unique = true)
+    private AdminAuth adminAuth;
 	
 	public Admin() {
 		
 	}
 
-	public Admin(String userName, String firstName, String lastName, LocalDate dateOfBirth, String pronoun,
-            String currentPosition, String myQuote, String headLine, String about, String profileImageUrl) {
+	public Admin(Long id, String firstName, String lastName, LocalDate dateOfBirth, String pronoun,
+            String currentPosition, String myQuote, String headLine, String about, String profileImageUrl, AdminAuth adminAuth) {
 
-	   this.userName = userName;
+       this.id = id;
 	   this.firstName = firstName;
 	   this.lastName = lastName;
 	   this.dateOfBirth = dateOfBirth;
@@ -60,15 +61,12 @@ public class Admin {
 	   this.headLine = headLine;
 	   this.about = about;
 	   this.profileImageUrl = profileImageUrl;
+       this.adminAuth = adminAuth;
 	}
-	
-	public String getUserName() {
-        return userName;
-    }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 
     public String getFirstName() {
         return firstName;
@@ -142,6 +140,14 @@ public class Admin {
     	this.profileImageUrl = profileImageUrl;
     }
 
+    public AdminAuth getAdminAuth() {
+        return adminAuth;
+    }
+
+    public void setAdminAuth(AdminAuth adminAuth) {
+        this.adminAuth = adminAuth;
+    }
+
     // equals()
 
     @Override
@@ -154,21 +160,21 @@ public class Admin {
 
         Admin admin = (Admin) o;
 
-        return Objects.equals(userName, admin.userName);
+        return Objects.equals(id, admin.id);
     }
 
     // hashCode()
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName);
+        return Objects.hash(id);
     }
 
     // toString()
 
     @Override
     public String toString() {
-        return "Admin [userName=" + userName +
+        return "Admin [id=" + id +
                 ", firstName=" + firstName +
                 ", lastName=" + lastName +
                 ", dateOfBirth=" + dateOfBirth +
@@ -177,7 +183,7 @@ public class Admin {
                 ", myQuote=" + myQuote +
                 ", headLine=" + headLine +
                 ", about=" + about +
-                ", profileImageUrl" + profileImageUrl +
+                ", profileImageUrl=" + profileImageUrl +
                 "]";
     }
 }

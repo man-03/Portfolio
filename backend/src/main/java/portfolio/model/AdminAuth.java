@@ -12,14 +12,8 @@ public class AdminAuth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(
-            name = "admin_user",
-            referencedColumnName = "user_name",
-            nullable = false,
-            unique = true
-    )
-    private Admin admin;
+    @Column(name = "admin_user", nullable = false, unique = true)
+    private String adminUser;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -43,12 +37,12 @@ public class AdminAuth {
         return id;
     }
 
-    public Admin getAdmin() {
-        return admin;
+    public String getAdminUser() {
+        return adminUser;
     }
 
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
+    public void setAdminUser(String adminUser) {
+        this.adminUser = adminUser;
     }
 
     public String getEmail() {

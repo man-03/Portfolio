@@ -24,9 +24,9 @@ public class AdminActivity {
 	
 	@Column(name="activity_media_url")
 	private String activityMediaUrl;
-	
-	@ManyToOne
-	@JoinColumn(name="admin_user")
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "admin_profile_id", nullable = false)
 	private Admin admin;
 	
 	public AdminActivity() {
@@ -55,7 +55,7 @@ public class AdminActivity {
 	}
 	
 	public String getActivityMediaUrl() {
-		return activityDescription;
+		return activityMediaUrl;
 	}
 	public void setActivityMediaUrl(String activityMediaUrl) {
 		this.activityMediaUrl = activityMediaUrl;

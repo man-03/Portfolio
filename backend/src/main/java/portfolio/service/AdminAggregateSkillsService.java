@@ -47,13 +47,14 @@ public class AdminAggregateSkillsService {
     public AdminSkillsAggregateResponseDTO getSkills(
             String userName) {
 
-        adminRepository.findByUserName(userName)
+        Admin admin = adminRepository
+                .findByAdminAuth_AdminUser(userName)
                 .orElseThrow(() ->
                         new RuntimeException("Admin not found"));
 
         List<AdminSkillsCategory> categories =
                 adminSkillsCategoryRepository
-                        .findByAdmin_UserName(userName);
+                        .findByAdmin_Id(admin.getId());
 
         List<AdminSkillsCategoryResponseDTO> categoryDTOs =
                 categories.stream()
@@ -91,7 +92,8 @@ public class AdminAggregateSkillsService {
             String userName,
             AdminSkillsAggregateRequestDTO request) {
 
-        Admin admin = adminRepository.findByUserName(userName)
+        Admin admin = adminRepository
+                .findByAdminAuth_AdminUser(userName)
                 .orElseThrow(() ->
                         new RuntimeException("Admin not found"));
 
@@ -137,13 +139,14 @@ public class AdminAggregateSkillsService {
             AdminSkillsAggregateRequestDTO request)
             throws JsonProcessingException {
 
-        Admin admin = adminRepository.findByUserName(userName)
+        Admin admin = adminRepository
+                .findByAdminAuth_AdminUser(userName)
                 .orElseThrow(() ->
                         new RuntimeException("Admin not found"));
 
         List<AdminSkillsCategory> existingCategories =
                 adminSkillsCategoryRepository
-                        .findByAdmin_UserName(userName);
+                        .findByAdmin_Id(admin.getId());
 
         Set<Long> receivedCategoryIds = new HashSet<>();
 
@@ -156,12 +159,11 @@ public class AdminAggregateSkillsService {
 
                 if (categoryDTO.getId() != null) {
 
-                    // categoryId + userName
                     category =
                             adminSkillsCategoryRepository
-                                    .findByIdAndAdmin_UserName(
+                                    .findByIdAndAdmin_Id(
                                             categoryDTO.getId(),
-                                            userName)
+                                            admin.getId())
                                     .orElseThrow(() ->
                                             new RuntimeException(
                                                     "Skills category not found"));
@@ -234,7 +236,6 @@ public class AdminAggregateSkillsService {
 
                 if (skillDTO.getId() != null) {
 
-                    // skillId + categoryId
                     AdminSkill skill =
                             adminSkillRepository
                                     .findByIdAndAdminSkillsCategory_Id(

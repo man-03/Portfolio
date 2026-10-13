@@ -51,7 +51,7 @@ public class AdminProjectController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("{userName}/project/{projectId}")
+	@DeleteMapping("/{userName}/project/{projectId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteProject(@PathVariable String userName, @PathVariable Long projectId) {
 		ApiResponse response = adminProjectService.deleteProject(userName, projectId);

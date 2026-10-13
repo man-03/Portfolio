@@ -13,12 +13,7 @@ public class AdminResume {
     private Long id;
 
     @OneToOne
-    @JoinColumn(
-            name = "admin_user",
-            referencedColumnName = "user_name",
-            nullable = false,
-            unique = true
-    )
+    @JoinColumn(name = "admin_profile_id", nullable = false)
     private Admin admin;
 
     @Column(name = "file_name", nullable = false)

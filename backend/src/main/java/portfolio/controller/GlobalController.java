@@ -30,7 +30,7 @@ public class GlobalController {
      * @param userName
      * @return
      */
-    @GetMapping("{userName}/resume")
+    @GetMapping("/{userName}/resume")
     public ResponseEntity<ByteArrayResource> getResume(
             @PathVariable String userName) {
 

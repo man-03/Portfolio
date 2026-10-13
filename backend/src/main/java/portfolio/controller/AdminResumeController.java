@@ -34,7 +34,7 @@ public class AdminResumeController {
     @PostMapping(
             value = "/{userName}/resume",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("@adminAuthorizationService.isAuthorized(authentication, #userName)")
+    @PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
     public ResponseEntity<AdminResumeResponseDTO> uploadResume(
             @PathVariable String userName,
             @RequestParam("file") MultipartFile file)
@@ -46,7 +46,7 @@ public class AdminResumeController {
     }
 
     @GetMapping("/{userName}/resume")
-    @PreAuthorize("@adminAuthorizationService.isAuthorized(authentication, #userName)")
+    @PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
     public ResponseEntity<AdminResumeResponseDTO> getResume(
             @PathVariable String userName) {
 
@@ -58,7 +58,7 @@ public class AdminResumeController {
     @PutMapping(
             value = "/{userName}/resume/{resumeId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("@adminAuthorizationService.isAuthorized(authentication, #userName)")
+    @PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
     public ResponseEntity<AdminResumeResponseDTO> updateResume(
             @PathVariable String userName,
             @PathVariable Long resumeId,
@@ -75,7 +75,7 @@ public class AdminResumeController {
     }
 
     @DeleteMapping("/{userName}/resume/{resumeId}")
-    @PreAuthorize("@adminAuthorizationService.isAuthorized(authentication, #userName)")
+    @PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
     public ResponseEntity<String> deleteResume(
             @PathVariable String userName,
             @PathVariable Long resumeId) {
@@ -88,7 +88,7 @@ public class AdminResumeController {
     }
 
     @GetMapping("/{userName}/resume/{resumeId}/file")
-    @PreAuthorize("@adminAuthorizationService.isAuthorized(authentication, #userName)")
+    @PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
     public ResponseEntity<ByteArrayResource> viewResume(
             @PathVariable String userName,
             @PathVariable Long resumeId) {

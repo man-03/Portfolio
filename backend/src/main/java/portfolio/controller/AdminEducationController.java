@@ -51,7 +51,7 @@ public class AdminEducationController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("{userName}/education/{educationId}")
+	@DeleteMapping("/{userName}/education/{educationId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteEducation(@PathVariable String userName, @PathVariable Long educationId) {
 		ApiResponse response = adminEducationService.deleteEducation(userName, educationId);

@@ -48,34 +48,35 @@ public class GlobalService {
 
     public GlobalResponseDTO userOnLoad(String userName) {
         GlobalResponseDTO globalResponseDTO = new GlobalResponseDTO();
-        Admin admin = adminRepository.findByUserName(userName).orElseThrow(() -> new RuntimeException("User Not Found"));
-        AdminAddress address = adminAddressRepository.findByAdmin_UserName(userName).orElseThrow(() -> new RuntimeException("Address Not Found"));
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName).orElseThrow(() -> new RuntimeException("User Not Found"));
+        Long adminId = admin.getId();
+
+        AdminAddress address = adminAddressRepository.findByAdmin_Id(adminId).orElseThrow(() -> new RuntimeException("Address Not Found"));
         AdminAddressResponseDTO adminAddressResponseDTO = adminMapper.convertAddressToDTO(address);
         AdminResponseDTO adminResponseDTO = adminMapper.convertAdminToDTO(admin, adminAddressResponseDTO);
 
-        AdminContact contact = adminContactRepository.findByAdmin_UserName(userName).orElseThrow(() -> new RuntimeException("User Not Found"));
+        AdminContact contact = adminContactRepository.findByAdmin_Id(adminId).orElseThrow(() -> new RuntimeException("User Not Found"));
         AdminContactResponseDTO adminContactResponseDTO = adminMapper.convertAdminContactToDTO(contact);
 
-        List<AdminLink> link = adminLinkRepository.findByAdmin_UserName(userName);
+        List<AdminLink> link = adminLinkRepository.findByAdmin_Id(adminId);
         List<AdminLinkResponseDTO> adminLinkResponseDTO = link.stream().map(adminMapper::convertAdminLinkToDTO).toList();
 
-        List<AdminExperience> experience = adminExperienceRepository.findByAdmin_UserName(userName);
+        List<AdminExperience> experience = adminExperienceRepository.findByAdmin_Id(adminId);
         List<AdminExperienceResponseDTO> adminExperienceResponseDTO = experience.stream().map(adminMapper::convertAdminExperienceToDTO).toList();
 
-        List<AdminProject> project = adminProjectRepository.findByAdmin_UserName(userName);
+        List<AdminProject> project = adminProjectRepository.findByAdmin_Id(adminId);
         List<AdminProjectResponseDTO> adminProjectRequestDTOS = project.stream().map(adminMapper::convertAdminProjectToDTO).toList();
 
-        List<AdminEducation> education = adminEducationRepository.findByAdmin_UserName(userName);
+        List<AdminEducation> education = adminEducationRepository.findByAdmin_Id(adminId);
         List<AdminEducationResponseDTO> adminEducationResponseDTOS = education.stream().map(adminMapper::convertAdminEducationToDTO).toList();
 
-        List<LicenseAndCertification> licenseAndCertification = licenseAndCertificationRepository.findByAdmin_UserName(userName);
+        List<LicenseAndCertification> licenseAndCertification = licenseAndCertificationRepository.findByAdmin_Id(adminId);
         List<LicenseAndCertificationResponseDTO> licenseAndCertificationResponseDTOS = licenseAndCertification.stream().map(adminMapper::convertLicenseAndCertificationToDTO).toList();
 
-        List<AdminActivity> activity = adminActivityRepository.findByAdmin_UserName(userName);
+        List<AdminActivity> activity = adminActivityRepository.findByAdmin_Id(adminId);
         List<AdminActivityResponseDTO> adminActivityResponseDTOS = activity.stream().map(adminMapper::convertAdminActivityToDTO).toList();
 
-
-        List<AdminSkillsCategory> categories = adminSkillsCategoryRepository.findByAdmin_UserName(userName);
+        List<AdminSkillsCategory> categories = adminSkillsCategoryRepository.findByAdmin_Id(adminId);
         List<AdminSkillsCategoryResponseDTO> categoryDTOs =
                 categories.stream()
                         .map(category -> {
@@ -100,7 +101,7 @@ public class GlobalService {
         adminSkillsAggregateResponseDTO.setCategories(categoryDTOs);
 
         AdminResumeResponseDTO resumeResponse = adminResumeRepository
-                .findByAdminUserName(userName)
+                .findByAdmin_Id(adminId)
                 .map(adminResume -> new AdminResumeResponseDTO(
                         adminResume.getId(),
                         adminResume.getFileName(),
@@ -109,7 +110,6 @@ public class GlobalService {
                         adminResume.getUploadedAt()
                 ))
                 .orElse(null);
-
 
         globalResponseDTO.setAdmin(adminResponseDTO);
         globalResponseDTO.setContact(adminContactResponseDTO);
@@ -126,9 +126,11 @@ public class GlobalService {
     }
 
     public AdminResume getResumeFile(String userName) {
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+                .orElseThrow(() -> new RuntimeException("User Not Found"));
 
         return adminResumeRepository
-                .findByAdminUserName(userName)
+                .findByAdmin_Id(admin.getId())
                 .orElseThrow(() ->
                         new RuntimeException("Resume not found"));
     }

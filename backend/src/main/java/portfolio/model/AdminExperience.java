@@ -54,9 +54,9 @@ public class AdminExperience {
 	
 	@Column(name="company_logo_url")
 	private String companyLogoUrl;
-	
-	@ManyToOne
-	@JoinColumn(name="admin_user")
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "admin_profile_id", nullable = false)
 	private Admin admin;
 	
 	public AdminExperience() {

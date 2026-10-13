@@ -25,9 +25,9 @@ public class AdminContact {
 	
 	@Column(name="phone")
 	private String phone;
-	
-	@OneToOne
-	@JoinColumn(name="admin_user")
+
+	@OneToOne(optional = false)
+	@JoinColumn(name = "admin_profile_id", nullable = false, unique = true)
 	private Admin admin;
 	
 	public AdminContact() {
@@ -86,7 +86,7 @@ public class AdminContact {
 	public String toString() {
 		return "AdminContact [id=" + id +
 				", email=" + email +
-				", phone=" + phone + 
+				", phone=" + phone +
 				", admin=" + admin + "]";
 	}
 }

@@ -32,12 +32,11 @@ public class AdminAuthorizationService {
                 .orElse(null);
 
         if (adminAuth == null ||
-                adminAuth.getAdmin() == null) {
+                adminAuth.getAdminUser() == null) {
             return false;
         }
 
-        return adminAuth.getAdmin()
-                .getUserName()
+        return adminAuth.getAdminUser()
                 .equals(userName);
     }
 

@@ -21,9 +21,9 @@ public class AdminSkillsCategory {
 	
 	@Column(name="category")
 	private String category;
-	
-	@ManyToOne
-	@JoinColumn(name="admin_user")
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "admin_profile_id", nullable = false)
 	private Admin admin;
 	
 	public AdminSkillsCategory() {

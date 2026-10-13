@@ -31,28 +31,28 @@ public class AdminLinkController {
 		this.adminLinkService = adminLinkService;
 	}
 	
-	@PostMapping("{userName}/link")
+	@PostMapping("/{userName}/link")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> createLink(@PathVariable String userName, @RequestBody AdminLinkRequestDTO adminLinkRequestDTO) {
 		ApiResponse response = adminLinkService.createLink(userName, adminLinkRequestDTO);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@GetMapping("{userName}/link")
+	@GetMapping("/{userName}/link")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<List<AdminLinkResponseDTO>> getLink(@PathVariable String userName) {
 		List<AdminLinkResponseDTO> response = adminLinkService.getLink(userName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@PutMapping("{userName}/link/{linkId}")
+	@PutMapping("/{userName}/link/{linkId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> updateLink(@PathVariable String userName, @PathVariable Long linkId, @RequestBody Map<String, Object> requestBody) {
 		ApiResponse response = adminLinkService.updateLink(userName, linkId, requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("{userName}/link/{linkId}")
+	@DeleteMapping("/{userName}/link/{linkId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteLink(@PathVariable String userName, @PathVariable Long linkId) {
 		ApiResponse response = adminLinkService.deleteLink(userName, linkId);

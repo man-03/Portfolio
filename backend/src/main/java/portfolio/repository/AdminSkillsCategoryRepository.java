@@ -9,10 +9,8 @@ import org.springframework.stereotype.Repository;
 import portfolio.model.AdminSkillsCategory;
 
 @Repository
-public interface AdminSkillsCategoryRepository extends JpaRepository<AdminSkillsCategory, Long>{
-	List<AdminSkillsCategory> findByAdmin_UserName(String userName);
+public interface AdminSkillsCategoryRepository extends JpaRepository<AdminSkillsCategory, Long> {
 
-    Optional<AdminSkillsCategory> findByIdAndAdmin_UserName(
-            Long categoryId,
-            String userName);
+    List<AdminSkillsCategory> findByAdmin_Id(Long adminProfileId);
+    Optional<AdminSkillsCategory> findByIdAndAdmin_Id(Long categoryId, Long adminProfileId);
 }

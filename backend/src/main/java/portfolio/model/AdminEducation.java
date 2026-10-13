@@ -57,9 +57,9 @@ public class AdminEducation {
 	
 	@Column(name="school_logo_url")
 	private String schoolLogoUrl;
-	
-	@ManyToOne
-	@JoinColumn(name="admin_user")
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "admin_profile_id", nullable = false)
 	private Admin admin;
 
 	public AdminEducation() {
@@ -217,7 +217,7 @@ public class AdminEducation {
 				", description=" + description +
 				", skills=" + skills +
 				", activities=" + activities +
-				", schoolLogoUrl=" + schoolLogoUrl + 
+				", schoolLogoUrl=" + schoolLogoUrl +
 				", admin=" + admin + "]";
 	}
 	

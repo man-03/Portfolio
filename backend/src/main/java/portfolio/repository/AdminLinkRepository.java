@@ -9,6 +9,6 @@ import portfolio.model.AdminLink;
 
 public interface AdminLinkRepository extends JpaRepository<AdminLink, Long> {
 
-	List<AdminLink> findByAdmin_UserName(String userName);
-	Optional<AdminLink> findByIdAndAdmin_UserName(Long linkId, String userName);
+	List<AdminLink> findByAdmin_Id(Long adminProfileId);
+	Optional<AdminLink> findByIdAndAdmin_Id(Long linkId, Long adminProfileId);
 }

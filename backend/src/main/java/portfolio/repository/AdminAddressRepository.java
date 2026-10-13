@@ -9,7 +9,5 @@ import portfolio.model.AdminAddress;
 
 @Repository
 public interface AdminAddressRepository extends JpaRepository<AdminAddress, Long> {
-
-	public Optional<AdminAddress> findByAdmin_UserName(String userName);
-
+	Optional<AdminAddress> findByAdmin_Id(Long adminProfileId);
 }

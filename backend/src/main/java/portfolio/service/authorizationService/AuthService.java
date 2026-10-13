@@ -59,7 +59,7 @@ public class AuthService {
                 adminAuth.getEmail()
         );
 
-        String userName = adminAuth.getAdmin().getUserName();
+        String userName = adminAuth.getAdminUser();
 
         return new LoginResponseDTO(token, userName);
     }

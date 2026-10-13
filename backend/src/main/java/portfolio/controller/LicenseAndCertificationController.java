@@ -30,7 +30,7 @@ public class LicenseAndCertificationController {
 		this.licenseAndCertificationService = licenseAndCertificationService;
 	}
 	
-	@PostMapping("{userName}/credential")
+	@PostMapping("/{userName}/credential")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> createCredential(@PathVariable String userName, @RequestBody LicenseAndCertificationRequestDTO licenseAndCertificationRequestDTO) {
 		ApiResponse response = licenseAndCertificationService.createCredential(userName, licenseAndCertificationRequestDTO);
@@ -51,7 +51,7 @@ public class LicenseAndCertificationController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@DeleteMapping("{userName}/credential/{credentialId}")
+	@DeleteMapping("/{userName}/credential/{credentialId}")
 	@PreAuthorize("@adminAuthorizationService.isCurrentAdmin(authentication, #userName)")
 	public ResponseEntity<ApiResponse> deleteCredential(@PathVariable String userName, @PathVariable Long credentialId) {
 		ApiResponse response = licenseAndCertificationService.deleteCredential(userName, credentialId);

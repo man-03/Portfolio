@@ -11,6 +11,6 @@ import portfolio.model.AdminEducation;
 @Repository
 public interface AdminEducationRepository extends JpaRepository<AdminEducation, Long> {
 
-	List<AdminEducation> findByAdmin_UserName(String userName);
-	Optional<AdminEducation> findByIdAndAdmin_UserName(Long educationId, String userName);
+	List<AdminEducation> findByAdmin_Id(Long adminProfileId);
+	Optional<AdminEducation> findByIdAndAdmin_Id(Long educationId, Long adminProfileId);
 }

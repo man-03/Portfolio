@@ -17,53 +17,59 @@ import portfolio.utls.EducationUpdateMapper;
 
 @Service
 public class AdminEducationService {
-	
+
 	private final AdminEducationRepository adminEducationRepository;
 	private final AdminRepository adminRepository;
 	private final AdminMapper adminMapper;
 	private final EducationUpdateMapper educationUpdateMapper;
-	
+
 	public AdminEducationService(AdminEducationRepository adminEducationRepository, AdminRepository adminRepository, AdminMapper adminMapper, EducationUpdateMapper educationUpdateMapper) {
 		this.adminEducationRepository = adminEducationRepository;
 		this.adminRepository = adminRepository;
 		this.adminMapper = adminMapper;
 		this.educationUpdateMapper=  educationUpdateMapper;
 	}
-	
+
 	public ApiResponse createEducation(String userName, AdminEducationRequestDTO adminEducationRequestDTO) {
 		AdminEducation education = adminMapper.convertDTOToAdminEducation(adminEducationRequestDTO);
-		Admin admin = adminRepository.findByUserName(userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
 				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		education.setAdmin(admin);
 		adminEducationRepository.save(education);
-		return new ApiResponse("True", "Education Saved Successfully");
+		return new ApiResponse("Success", "Education Saved Successfully");
 	}
-	
+
 	public List<AdminEducationResponseDTO> getEducation(String userName) {
-		List<AdminEducation> education = adminEducationRepository.findByAdmin_UserName(userName);
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		List<AdminEducation> education = adminEducationRepository.findByAdmin_Id(admin.getId());
 		return education.stream()
 				.map(adminMapper::convertAdminEducationToDTO).toList();
 	}
-	
+
 	// Existing entity is fetched as a managed entity.
 	// @Transactional enables Hibernate Dirty Checking, so any modifications
 	// made to the entity are automatically synchronized with the database
 	// when the transaction commits. Explicit repository.save() is not required.
 	@Transactional
 	public ApiResponse updateEducation(String userName, Long educationId, AdminEducationRequestDTO adminEducationRequestDTO) {
-		AdminEducation education = adminEducationRepository.findByIdAndAdmin_UserName(educationId, userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		AdminEducation education = adminEducationRepository.findByIdAndAdmin_Id(educationId, admin.getId())
 				.orElseThrow(() -> new RuntimeException("Education Not Found"));
 		educationUpdateMapper.updateEducation(adminEducationRequestDTO, education);
-		return new ApiResponse("True", "Education Updated Successfully");
+		return new ApiResponse("Success", "Education Updated Successfully");
 	}
-	
+
 	@Transactional
 	public ApiResponse deleteEducation(String userName, Long educationId) {
-		AdminEducation education = adminEducationRepository.findByIdAndAdmin_UserName(educationId, userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		AdminEducation education = adminEducationRepository.findByIdAndAdmin_Id(educationId, admin.getId())
 				.orElseThrow(() -> new RuntimeException("Education Not Found"));
 		adminEducationRepository.delete(education);
-		return new ApiResponse("True", "Education Deleted Successfully");
+		return new ApiResponse("Success", "Education Deleted Successfully");
 	}
-	
-	
+
+
 }

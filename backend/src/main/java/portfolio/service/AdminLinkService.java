@@ -21,43 +21,49 @@ public class AdminLinkService {
 	private final AdminLinkRepository adminLinkRepository;
 	private final AdminRepository adminRepository;
 	private final AdminMapper adminMapper;
-	
-	
+
+
 	public AdminLinkService(AdminLinkRepository adminLinkRepository, AdminRepository adminRepository, AdminMapper adminMapper) {
 		this.adminLinkRepository = adminLinkRepository;
 		this.adminRepository = adminRepository;
 		this.adminMapper = adminMapper;
 	}
-	
+
 	public ApiResponse createLink(String userName,  AdminLinkRequestDTO adminLinkRequestDTO) {
 		AdminLink link = adminMapper.convertDTOToAdminLink(adminLinkRequestDTO);
-		Admin admin = adminRepository.findByUserName(userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
 				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		link.setAdmin(admin);
 		adminLinkRepository.save(link);
-		return new ApiResponse("True", "Link Saved Successfully");
+		return new ApiResponse("Success", "Link Saved Successfully");
 	}
-	
+
 	public List<AdminLinkResponseDTO> getLink(String userName) {
-		List<AdminLink> link = adminLinkRepository.findByAdmin_UserName(userName);
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		List<AdminLink> link = adminLinkRepository.findByAdmin_Id(admin.getId());
 		return link.stream()
 				.map(adminMapper::convertAdminLinkToDTO)
 				.toList();
 	}
-	
+
 	@Transactional
 	public ApiResponse updateLink(String userName, Long linkId, Map<String, Object> requestBody) {
-		AdminLink link = adminLinkRepository.findByIdAndAdmin_UserName(linkId, userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		AdminLink link = adminLinkRepository.findByIdAndAdmin_Id(linkId, admin.getId())
 				.orElseThrow(() -> new RuntimeException("Link Not Found"));
 		adminMapper.updateAdminLink(requestBody, link);
-		return new ApiResponse("True", "Link Updated Successfully");
+		return new ApiResponse("Success", "Link Updated Successfully");
 	}
-	
+
 	@Transactional
 	public ApiResponse deleteLink(String userName, Long linkId) {
-		AdminLink link = adminLinkRepository.findByIdAndAdmin_UserName(linkId, userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		AdminLink link = adminLinkRepository.findByIdAndAdmin_Id(linkId, admin.getId())
 				.orElseThrow(() -> new RuntimeException("Link Not Found"));
 		adminLinkRepository.delete(link);
-		return new ApiResponse("True", "Link Deleted Successfully");
+		return new ApiResponse("Success", "Link Deleted Successfully");
 	}
 }

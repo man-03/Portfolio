@@ -22,43 +22,49 @@ public class AdminProjectService {
 	private final AdminRepository adminRepository;
 	private final AdminMapper adminMapper;
 	private final ProjectUpdateMapper projectUpdateMapper;
-	
+
 	public AdminProjectService(AdminProjectRepository adminProjectRepository, AdminRepository adminRepository, AdminMapper adminMapper, ProjectUpdateMapper projectUpdateMapper) {
 		this.adminProjectRepository = adminProjectRepository;
 		this.adminRepository = adminRepository;
 		this.adminMapper = adminMapper;
 		this.projectUpdateMapper = projectUpdateMapper;
 	}
-	
+
 	public ApiResponse createProject(AdminProjectRequestDTO adminProjectRequestDTO, String userName) {
 		AdminProject project = adminMapper.convertDTOToAdminProject(adminProjectRequestDTO);
-		Admin admin = adminRepository.findByUserName(userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
 				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
 		project.setAdmin(admin);
 		adminProjectRepository.save(project);
-		return new ApiResponse("True", "Project Saved Successfully");	
+		return new ApiResponse("Success", "Project Saved Successfully");
 	}
-	
+
 	public List<AdminProjectResponseDTO> getProject(String userName) {
-		List<AdminProject> project = adminProjectRepository.findByAdmin_UserName(userName);
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		List<AdminProject> project = adminProjectRepository.findByAdmin_Id(admin.getId());
 		return project.stream()
 				.map(adminMapper::convertAdminProjectToDTO)
 				.toList();
 	}
-	
+
 	@Transactional
 	public ApiResponse updateProject(String userName, Long projectId, AdminProjectRequestDTO adminProjectRequestDTO) {
-		AdminProject project = adminProjectRepository.findByIdAndAdmin_UserName(projectId, userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		AdminProject project = adminProjectRepository.findByIdAndAdmin_Id(projectId, admin.getId())
 				.orElseThrow(() -> new RuntimeException("Project Not Found"));
 		projectUpdateMapper.updateProject(adminProjectRequestDTO, project);
-		return new ApiResponse("True", "Project Updated Successfully");
+		return new ApiResponse("Success", "Project Updated Successfully");
 	}
-	
+
 	@Transactional
 	public ApiResponse deleteProject(String userName, Long projectId) {
-		AdminProject project = adminProjectRepository.findByIdAndAdmin_UserName(projectId, userName)
+		Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+				.orElseThrow(() -> new RuntimeException("Admin Not Found"));
+		AdminProject project = adminProjectRepository.findByIdAndAdmin_Id(projectId, admin.getId())
 				.orElseThrow(() -> new RuntimeException("Project Not Found"));
 		adminProjectRepository.delete(project);
-		return new ApiResponse("True", "Project Deleted Successfully");
+		return new ApiResponse("Success", "Project Deleted Successfully");
 	}
 }
