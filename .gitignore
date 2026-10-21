@@ -40,3 +40,6 @@ backend/src/main/resources/application.properties
 
 # Spring Boot generated file
 HELP.md
+
+# PostgreSQL DB
+db backup/

@@ -19,9 +19,9 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setFrom("quickfolio.app@gmail.com");
+        message.setFrom("manoj.horizons@gmail.com");
         message.setTo(toEmail);
-        message.setSubject("Password Reset - Portfolio");
+        message.setSubject("Password Reset - Dossier");
 
         message.setText(
                 "Hello,\n\n" +
@@ -31,7 +31,7 @@ public class EmailService {
                         "This link will expire in 15 minutes.\n\n" +
                         "If you did not request this, you can safely ignore this email.\n\n" +
                         "Regards,\n" +
-                        "Portfolio"
+                        "Dossier"
         );
 
         mailSender.send(message);
@@ -46,10 +46,10 @@ public class EmailService {
 
         mailMessage.setFrom("quickfolio.app@gmail.com");
         mailMessage.setTo("immanoj312@gmail.com");
-        mailMessage.setSubject("New Portfolio Contact Message");
+        mailMessage.setSubject("New Dossier Contact Message");
 
         mailMessage.setText(
-                "New message received from your portfolio.\n\n" +
+                "New message received from your dossier.\n\n" +
                         "Name: " + name + "\n" +
                         "Email: " + email + "\n\n" +
                         "Message:\n" +
