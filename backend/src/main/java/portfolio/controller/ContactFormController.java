@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import portfolio.dto.ContactFormRequestDTO;
 import portfolio.service.ContactFormService;
+import portfolio.utls.ApiResponse;
 
 @RestController
 @RequestMapping("/api/public/contact")
@@ -16,11 +17,12 @@ public class ContactFormController {
     }
 
     @PostMapping
-    public ResponseEntity<String> sendMessage(
-            @RequestBody ContactFormRequestDTO request) {
+    public ResponseEntity<ApiResponse> sendMessage(@RequestParam String userName, @RequestBody ContactFormRequestDTO request) {
 
-        contactFormService.sendMessage(request);
+        contactFormService.sendMessage(userName, request);
 
-        return ResponseEntity.ok("Message sent successfully.");
+        return ResponseEntity.ok(
+                new ApiResponse("true", "Query sent successfully.")
+        );
     }
 }

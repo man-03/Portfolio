@@ -1,41 +1,48 @@
 package portfolio.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import portfolio.dto.ContactFormRequestDTO;
+import portfolio.model.Admin;
+import portfolio.model.AdminContactSubmission;
+import portfolio.repository.AdminContactSubmissionRepository;
+import portfolio.repository.AdminRepository;
 
 @Service
 public class ContactFormService {
 
     private final EmailService emailService;
+    private final AdminContactSubmissionRepository contactRepository;
+    private final AdminRepository adminRepository;
 
-    public ContactFormService(EmailService emailService) {
+    public ContactFormService(
+            EmailService emailService,
+            AdminContactSubmissionRepository contactRepository,
+            AdminRepository adminRepository) {
         this.emailService = emailService;
+        this.contactRepository = contactRepository;
+        this.adminRepository = adminRepository;
     }
 
-    public void sendMessage(ContactFormRequestDTO request) {
+    @Transactional
+    public void sendMessage(String userName, ContactFormRequestDTO request) {
 
-        if (request.getName() == null || request.getName().isBlank()) {
-            throw new RuntimeException("Name is required");
-        }
+        Admin admin = adminRepository.findByAdminAuth_AdminUser(userName)
+                .orElseThrow(() -> new RuntimeException("Admin Not Found"));
 
-        if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new RuntimeException("Email is required");
-        }
+        AdminContactSubmission submission = new AdminContactSubmission();
+        submission.setAdmin(admin);
+        submission.setName(request.getName().trim());
+        submission.setEmail(request.getEmail().trim());
+        submission.setMessage(request.getMessage().trim());
 
-        if (request.getMessage() == null || request.getMessage().isBlank()) {
-            throw new RuntimeException("Message is required");
-        }
-
-        if (request.getMessage().length() > 3000) {
-            throw new RuntimeException(
-                    "Message must not exceed 3000 characters"
-            );
-        }
+        contactRepository.save(submission);
 
         emailService.sendContactFormEmail(
-                request.getName(),
-                request.getEmail(),
-                request.getMessage()
+                submission.getName(),
+                submission.getEmail(),
+                submission.getMessage()
         );
     }
 }
