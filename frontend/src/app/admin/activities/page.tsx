@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { ActivitiesView } from "@/features/admin/collection-views";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Activities" };
-
-export default function ActivitiesPage() {
-  return <ActivitiesView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

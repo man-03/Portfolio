@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { CredentialsView } from "@/features/admin/collection-views";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Credentials" };
-
-export default function CredentialsPage() {
-  return <CredentialsView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

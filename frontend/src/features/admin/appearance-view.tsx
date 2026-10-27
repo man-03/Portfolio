@@ -1,26 +1,15 @@
 "use client";
 
-import { ThemeControls } from "@/components/theme-controls";
-import { ACCENTS } from "@/hooks/use-theme";
-
 export function AppearanceView() {
   return (
     <section className="stack">
       <header className="page-intro">
         <h1>Appearance</h1>
-        <p>Light or dark mode and the accent color are saved in this browser and apply to both the portfolio and the studio.</p>
+        <p>
+          Studio theme and accent are controlled from the sidebar and save automatically to your account.
+          Visitor light/dark preference stays in their browser only.
+        </p>
       </header>
-      <article className="panel clay stack">
-        <h2>Theme and accent</h2>
-        <ThemeControls />
-        <ul className="plain-list">
-          {ACCENTS.map((accent) => (
-            <li key={accent.id} className="pill">
-              {accent.label}
-            </li>
-          ))}
-        </ul>
-      </article>
     </section>
   );
 }

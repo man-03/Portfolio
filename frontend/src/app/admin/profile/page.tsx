@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ProfileView } from "@/features/admin/profile-view";
+import { ProfileWorkspace } from "@/features/admin/profile-workspace";
 
-export const metadata: Metadata = { title: "Profile" };
+export const metadata: Metadata = { title: "My Profile" };
 
 export default function ProfilePage() {
-  return <ProfileView />;
+  return <ProfileWorkspace />;
 }

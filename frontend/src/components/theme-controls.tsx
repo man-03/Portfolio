@@ -1,35 +1,15 @@
 "use client";
 
-import { useTheme } from "@/hooks/use-theme";
+import { ThemeModeSwitch } from "@/components/theme-mode-switch";
+import { useVisitorTheme } from "@/hooks/use-theme";
 
+/** Public portfolio light/dark toggle. Never writes admin settings. */
 export function ThemeControls({ compact = false }: { compact?: boolean }) {
-  const { theme, accent, setTheme, setAccent, accents } = useTheme();
-  const dark = theme === "dark";
+  const { theme, setTheme } = useVisitorTheme();
 
   return (
     <div className={compact ? "theme-controls compact" : "theme-controls"}>
-      <button
-        type="button"
-        className="theme-toggle"
-        aria-pressed={dark}
-        onClick={() => setTheme(dark ? "light" : "dark")}
-      >
-        {dark ? "Light mode" : "Dark mode"}
-      </button>
-      <div className="swatch-row" role="radiogroup" aria-label="Accent color">
-        {accents.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            role="radio"
-            aria-checked={accent === item.id}
-            aria-label={item.label}
-            className={`swatch ${accent === item.id ? "is-selected" : ""}`}
-            style={{ background: item.swatch }}
-            onClick={() => setAccent(item.id)}
-          />
-        ))}
-      </div>
+      <ThemeModeSwitch theme={theme} onChange={setTheme} label="Visitor color theme" />
     </div>
   );
 }

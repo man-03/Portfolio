@@ -50,7 +50,14 @@ async function send(path: string, options: RequestOptions) {
       signal: options.signal,
     });
   } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") throw error;
+    const aborted =
+      (error instanceof DOMException && error.name === "AbortError") ||
+      (error instanceof Error && error.name === "AbortError") ||
+      options.signal?.aborted;
+    if (aborted) {
+      const abortError = error instanceof Error ? error : new DOMException("Aborted", "AbortError");
+      throw abortError;
+    }
     throw new ApiError("The server could not be reached. Check that the API is running.", 0);
   }
 

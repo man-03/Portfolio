@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { SkillsView } from "@/features/admin/skills-view";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Skills" };
-
-export default function SkillsPage() {
-  return <SkillsView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

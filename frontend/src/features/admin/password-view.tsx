@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Button, TextField } from "@/components/ui/controls";
+import { Button } from "@/components/ui/controls";
 import { FormBanner, SuccessNote } from "@/components/ui/feedback";
+import { PasswordField } from "@/components/ui/password-field";
 import { useToast } from "@/hooks/use-toast";
 import { errorMessage, readMessage } from "@/lib/errors";
 import { authApi } from "@/services/auth-api";
@@ -51,15 +52,15 @@ export function PasswordView() {
   return (
     <section className="stack">
       <header className="page-intro">
-        <h1>Password</h1>
+        <h1 id="password-title">Password</h1>
         <p>Change the password for the signed-in admin email.</p>
       </header>
       <form className="editor clay stack" onSubmit={onSubmit} noValidate>
         <FormBanner message={error} />
         <SuccessNote message={success} />
-        <TextField id="current-password" label="Current password" type="password" value={currentPassword} onChange={setCurrentPassword} autoComplete="current-password" required />
-        <TextField id="new-password" label="New password" type="password" value={newPassword} onChange={setNewPassword} autoComplete="new-password" required />
-        <TextField id="confirm-password" label="Confirm new password" type="password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" required />
+        <PasswordField id="current-password" label="Current password" value={currentPassword} onChange={setCurrentPassword} autoComplete="current-password" />
+        <PasswordField id="new-password" label="New password" value={newPassword} onChange={setNewPassword} autoComplete="new-password" />
+        <PasswordField id="confirm-password" label="Confirm new password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" />
         <Button type="submit" disabled={pending}>
           {pending ? "Saving..." : "Change password"}
         </Button>

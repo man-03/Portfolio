@@ -9,11 +9,14 @@ export function loadPortfolio(userName: string, signal?: AbortSignal) {
   });
 }
 
-export function sendContactMessage(body: ContactFormRequest) {
-  return apiRequest<string>("/api/public/contact", {
-    method: "POST",
-    body,
-  });
+export function sendContactMessage(userName: string, body: ContactFormRequest) {
+  return apiRequest<{ success?: string; message?: string } | string>(
+    `/api/public/contact?userName=${encodeURIComponent(userName)}`,
+    {
+      method: "POST",
+      body,
+    },
+  );
 }
 
 export function publicResumeUrl(userName: string) {

@@ -58,6 +58,11 @@ export function readSession() {
 export function writeSession(session: Session) {
   sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   cachedRaw = undefined;
+  try {
+    sessionStorage.setItem("dossier.portfolio-username", session.userName);
+  } catch {
+    // ignore quota / private mode
+  }
   window.dispatchEvent(new Event(SESSION_EVENT));
 }
 

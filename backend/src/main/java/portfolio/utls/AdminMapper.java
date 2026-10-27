@@ -10,39 +10,8 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import portfolio.dto.AdminActivityRequestDTO;
-import portfolio.dto.AdminActivityResponseDTO;
-import portfolio.dto.AdminAddressRequestDTO;
-import portfolio.dto.AdminAddressResponseDTO;
-import portfolio.dto.AdminContactRequestDTO;
-import portfolio.dto.AdminContactResponseDTO;
-import portfolio.dto.AdminEducationRequestDTO;
-import portfolio.dto.AdminEducationResponseDTO;
-import portfolio.dto.AdminExperienceRequestDTO;
-import portfolio.dto.AdminExperienceResponseDTO;
-import portfolio.dto.AdminLinkRequestDTO;
-import portfolio.dto.AdminLinkResponseDTO;
-import portfolio.dto.AdminProjectRequestDTO;
-import portfolio.dto.AdminProjectResponseDTO;
-import portfolio.dto.AdminRequestDTO;
-import portfolio.dto.AdminResponseDTO;
-import portfolio.dto.AdminSkillRequestDTO;
-import portfolio.dto.AdminSkillResponseDTO;
-import portfolio.dto.AdminSkillsCategoryRequestDTO;
-import portfolio.dto.AdminSkillsCategoryResponseDTO;
-import portfolio.dto.LicenseAndCertificationRequestDTO;
-import portfolio.dto.LicenseAndCertificationResponseDTO;
-import portfolio.model.Admin;
-import portfolio.model.AdminActivity;
-import portfolio.model.AdminAddress;
-import portfolio.model.AdminContact;
-import portfolio.model.AdminEducation;
-import portfolio.model.AdminExperience;
-import portfolio.model.AdminLink;
-import portfolio.model.AdminProject;
-import portfolio.model.AdminSkill;
-import portfolio.model.AdminSkillsCategory;
-import portfolio.model.LicenseAndCertification;
+import portfolio.dto.*;
+import portfolio.model.*;
 
 @Component
 public class AdminMapper {
@@ -497,4 +466,19 @@ public class AdminMapper {
 
 	    objectMapper.updateValue(skill, requestBody);
 	}
+
+    public AdminPortfolioSettingsResponseDTO convertSettingsToDTO(
+            AdminPortfolioSettings settings) {
+
+        AdminPortfolioSettingsResponseDTO dto =
+                new AdminPortfolioSettingsResponseDTO();
+
+        dto.setTheme(settings.getTheme().name());
+        dto.setAccentPalette(settings.getAccentPalette());
+        dto.setSectionVisibility(settings.getSectionVisibility());
+        dto.setSectionOrder(settings.getSectionOrder());
+        dto.setUpdatedAt(settings.getUpdatedAt());
+
+        return dto;
+    }
 }

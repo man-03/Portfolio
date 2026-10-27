@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { ResumeView } from "@/features/admin/resume-view";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Resume" };
-
-export default function ResumePage() {
-  return <ResumeView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

@@ -1,26 +1,59 @@
 "use client";
 
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { Brand } from "@/components/brand";
-import { Button, TextField } from "@/components/ui/controls";
+import type { FormEvent, ReactNode } from "react";
+import { Wordmark } from "@/components/wordmark";
+import { Button } from "@/components/ui/controls";
 import { FormBanner, SuccessNote } from "@/components/ui/feedback";
+import { PasswordField } from "@/components/ui/password-field";
 import { useHasMounted, useSession } from "@/hooks/use-session";
+import { getSiteName } from "@/lib/config";
 import { errorMessage, readMessage } from "@/lib/errors";
 import { validateEmail } from "@/lib/forms";
 import { writeSession } from "@/lib/session";
 import { authApi } from "@/services/auth-api";
 
-function AuthScreen({ title, copy, children }: { title: string; copy: string; children: ReactNode }) {
+const INTRO_KEY = "dossier.admin-intro";
+const INTRO_EVENT = "dossier-intro";
+
+function subscribeIntro(onStoreChange: () => void) {
+  window.addEventListener(INTRO_EVENT, onStoreChange);
+  return () => window.removeEventListener(INTRO_EVENT, onStoreChange);
+}
+
+function readIntro() {
+  return sessionStorage.getItem(INTRO_KEY) === "1" ? "form" : "intro";
+}
+
+function AuthScreen({ title, copy, children }: { title: string; copy?: string; children: ReactNode }) {
+  const year = new Date().getFullYear();
   return (
     <main id="content" className="auth-screen">
       <section className="auth-card clay">
-        <Brand />
+        <Wordmark />
         <h1>{title}</h1>
-        <p className="auth-copy">{copy}</p>
+        {copy ? <p className="auth-copy">{copy}</p> : null}
         {children}
       </section>
+      <p className="copyright auth-copyright">
+        © {year} {getSiteName()}
+      </p>
+    </main>
+  );
+}
+
+function IntroScreen() {
+  return (
+    <main className="intro-screen" aria-live="polite">
+      <div className="intro-card">
+        <Wordmark />
+        <p>Opening studio</p>
+        <div className="intro-bar" aria-hidden="true">
+          <span />
+        </div>
+      </div>
     </main>
   );
 }
@@ -29,6 +62,7 @@ export function LoginView() {
   const router = useRouter();
   const session = useSession();
   const mounted = useHasMounted();
+  const phase = useSyncExternalStore(subscribeIntro, readIntro, () => "intro" as const);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +71,15 @@ export function LoginView() {
   useEffect(() => {
     if (mounted && session) router.replace("/admin");
   }, [mounted, session, router]);
+
+  useEffect(() => {
+    if (!mounted || session || phase === "form") return;
+    const timer = window.setTimeout(() => {
+      sessionStorage.setItem(INTRO_KEY, "1");
+      window.dispatchEvent(new Event(INTRO_EVENT));
+    }, 2000);
+    return () => window.clearTimeout(timer);
+  }, [mounted, session, phase]);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -60,12 +103,33 @@ export function LoginView() {
     }
   }
 
+  if (!mounted || session || phase === "intro") return <IntroScreen />;
+
   return (
-    <AuthScreen title="Sign in" copy="Use the admin email and password.">
+    <AuthScreen title="Welcome Admin">
       <form className="stack" onSubmit={onSubmit} noValidate>
         <FormBanner message={error} />
-        <TextField id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
-        <TextField id="password" label="Password" type="password" value={password} onChange={setPassword} autoComplete="current-password" required />
+        <div className="field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="email@example.com"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </div>
+        <PasswordField
+          id="password"
+          label="Password"
+          value={password}
+          onChange={setPassword}
+          autoComplete="current-password"
+          placeholder="Password"
+        />
         <Button type="submit" disabled={pending}>
           {pending ? "Signing in..." : "Sign in"}
         </Button>
@@ -104,7 +168,10 @@ export function ForgotPasswordView() {
       <form className="stack" onSubmit={onSubmit} noValidate>
         <FormBanner message={error} />
         <SuccessNote message={success} />
-        <TextField id="reset-email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" required />
+        <div className="field">
+          <label htmlFor="reset-email">Email</label>
+          <input id="reset-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} />
+        </div>
         <Button type="submit" disabled={pending}>
           {pending ? "Sending..." : "Send reset link"}
         </Button>
@@ -147,8 +214,8 @@ export function ResetPasswordView({ token }: { token: string }) {
       <form className="stack" onSubmit={onSubmit} noValidate>
         <FormBanner message={error ?? (token ? null : "This reset link is missing a token.")} />
         <SuccessNote message={success} />
-        <TextField id="reset-password" label="New password" type="password" value={password} onChange={setPassword} autoComplete="new-password" required />
-        <TextField id="reset-confirm" label="Confirm password" type="password" value={confirm} onChange={setConfirm} autoComplete="new-password" required />
+        <PasswordField id="reset-password" label="New password" value={password} onChange={setPassword} autoComplete="new-password" />
+        <PasswordField id="reset-confirm" label="Confirm password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
         <Button type="submit" disabled={pending || !token}>
           {pending ? "Saving..." : "Reset password"}
         </Button>

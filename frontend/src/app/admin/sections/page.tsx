@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { SectionsView } from "@/features/admin/sections-view";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Section visibility" };
-
-export default function SectionsPage() {
-  return <SectionsView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

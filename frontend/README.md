@@ -41,14 +41,26 @@ No API documentation Word file was present in the workspace. Requests follow the
 
 - Public portfolio: `POST /api/public/{userName}`
 - Public resume file: `GET /api/public/{userName}/resume`
-- Public message: `POST /api/public/contact`
+- Public message: `POST /api/public/contact?userName={userName}`
+- Admin settings: `GET|PATCH /api/admin/{userName}/settings` (theme, accentPalette, sectionVisibility, sectionOrder)
+- Browser calls use same-origin `/api/...` via a Next.js rewrite to the Spring Boot origin (see `next.config.ts`). This avoids CORS preflight failures when the backend allow-list omits `PATCH`.
 - Login: `POST /api/auth/login` with `{ email, password }`, response `{ token, userName }`
 - Authenticated calls send `Authorization: Bearer <token>`
 - The token is kept in `sessionStorage` for the browser tab. The API does not use auth cookies.
 
-### Section visibility
+### Settings and themes
 
-The backend has no visibility flag. Sections with no content are omitted from the public page, including their headings. Profile, address, and contact must all exist or the public load fails.
+- Admin theme, accent, section visibility, and section order load from and auto-save to `/api/admin/{userName}/settings` (no Save button). Shared across Dashboard, My Profile, sidebar, and Global View.
+- Admin theme applies only inside `/admin/*`. Visitor light/dark preference uses `localStorage` key `dossier.visitor-theme` and is never sent to the API.
+- Global View reuses `PublicPortfolio` in preview mode with the admin’s saved order and visibility.
+- Public portfolio reads `settings` (accentPalette, sectionVisibility, sectionOrder) from `POST /api/public/{userName}`. Admin `theme` in that payload is ignored; visitors keep their own light/dark preference.
+- Studio accents: Forest Meadow (`TERRACOTTA`), Ocean Slate (`LAGOON`), Midnight & Parchment (`MIDNIGHT_PARCHMENT`), Vermilion (`VERMILION`).
+- **Backend CORS note:** `CorsConfig` allows `GET,POST,PUT,DELETE,OPTIONS` but not `PATCH`. Direct browser calls to `:8080` get `OPTIONS 403` on settings saves. The frontend rewrite avoids that; adding `PATCH` to allowed methods is still recommended.
+
+### Dashboard blockers
+
+- No analytics endpoints for referrals, resume downloads, or contact submissions.
+- No contact-submission inbox APIs (list/archive/delete/mark-read/export). Admin `/contact` manages published email/phone only.
 
 ### Other backend limits
 

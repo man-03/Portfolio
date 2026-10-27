@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { ContactView } from "@/features/admin/contact-view";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Contact" };
-
-export default function ContactPage() {
-  return <ContactView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

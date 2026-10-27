@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { AppearanceView } from "@/features/admin/appearance-view";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Appearance" };
-
-export default function AppearancePage() {
-  return <AppearanceView />;
+export default function Page() {
+  redirect("/admin");
 }

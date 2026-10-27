@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { LinksView } from "@/features/admin/collection-views";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Links" };
-
-export default function LinksPage() {
-  return <LinksView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

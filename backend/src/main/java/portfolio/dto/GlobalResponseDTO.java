@@ -14,6 +14,7 @@ public class GlobalResponseDTO {
     private AdminSkillsAggregateResponseDTO skills;
     private List<AdminActivityResponseDTO> activity;
     private AdminResumeResponseDTO resume;
+    private AdminPortfolioSettingsResponseDTO settings;
 
     public GlobalResponseDTO() {
 
@@ -29,7 +30,8 @@ public class GlobalResponseDTO {
             List<LicenseAndCertificationResponseDTO> licenseAndCertification,
             AdminSkillsAggregateResponseDTO skills,
             List<AdminActivityResponseDTO> activity,
-            AdminResumeResponseDTO resume) {
+            AdminResumeResponseDTO resume,
+        AdminPortfolioSettingsResponseDTO settings) {
 
         this.admin = admin;
         this.contact = contact;
@@ -41,6 +43,7 @@ public class GlobalResponseDTO {
         this.skills = skills;
         this.activity = activity;
         this.resume = resume;
+        this.settings = settings;
     }
 
     public AdminResponseDTO getAdmin() {
@@ -124,6 +127,14 @@ public class GlobalResponseDTO {
         this.resume = resume;
     }
 
+    public AdminPortfolioSettingsResponseDTO getSettings() {
+        return settings;
+    }
+
+    public void setSettings(AdminPortfolioSettingsResponseDTO settings) {
+        this.settings = settings;
+    }
+
     @Override
     public String toString() {
         return "GlobalResponseDTO{" +
@@ -136,6 +147,7 @@ public class GlobalResponseDTO {
                 ", licenseAndCertification=" + licenseAndCertification +
                 ", skills=" + skills +
                 ", activity=" + activity +
+                ", settings=" + settings +
                 '}';
     }
 }

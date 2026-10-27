@@ -1,3 +1,5 @@
+import type { PortfolioSettingsResponse } from "@/types/settings";
+
 export type ApiResponse = {
   success: string;
   message: string;
@@ -208,4 +210,6 @@ export type Portfolio = {
   skills: SkillsAggregate | null;
   activity: Activity[] | null;
   resume: ResumeMeta | null;
+  /** Public layout config from POST /api/public/{userName}. Theme here is ignored for visitors. */
+  settings?: PortfolioSettingsResponse | null;
 };

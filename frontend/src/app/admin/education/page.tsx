@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { EducationView } from "@/features/admin/collection-views";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Education" };
-
-export default function EducationPage() {
-  return <EducationView />;
+export default function Page() {
+  redirect("/admin/profile");
 }

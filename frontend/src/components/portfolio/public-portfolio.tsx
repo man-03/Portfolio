@@ -2,12 +2,17 @@
 
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
-import { Brand } from "@/components/brand";
+import { SiteFooter } from "@/components/site-footer";
+import { Wordmark } from "@/components/wordmark";
 import { ThemeControls } from "@/components/theme-controls";
 import { Button, TextArea, TextField } from "@/components/ui/controls";
 import { ErrorState, FormBanner, Skeleton, SuccessNote } from "@/components/ui/feedback";
+import type { SectionId } from "@/features/admin/section-ids";
+import { SECTION_IDS, isSectionId } from "@/features/admin/section-ids";
 import { getPortfolioUserName } from "@/lib/config";
 import { ApiError, errorMessage } from "@/lib/errors";
+import { applySettingsResponse } from "@/lib/settings-map";
+import { applyPublicAccent, writeSiteBrand } from "@/lib/site-brand";
 import {
   formatBytes,
   formatPeriod,
@@ -68,7 +73,7 @@ function PortfolioSkeleton() {
   );
 }
 
-function ContactForm() {
+function ContactForm({ userName }: { userName: string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -87,8 +92,14 @@ function ContactForm() {
     setError(null);
     setSuccess(null);
     try {
-      const result = await sendContactMessage({ name: name.trim(), email: email.trim(), message: message.trim() });
-      setSuccess(typeof result === "string" ? result : "Message sent successfully.");
+      const result = await sendContactMessage(userName, { name: name.trim(), email: email.trim(), message: message.trim() });
+      const messageText =
+        typeof result === "string"
+          ? result
+          : result && typeof result === "object" && "message" in result && typeof result.message === "string"
+            ? result.message
+            : "Message sent successfully.";
+      setSuccess(messageText);
       setName("");
       setEmail("");
       setMessage("");
@@ -114,14 +125,46 @@ function ContactForm() {
   );
 }
 
-export function PublicPortfolio() {
-  const userName = getPortfolioUserName();
+export type PublicPortfolioProps = {
+  userName?: string;
+  mode?: "public" | "preview";
+  sectionOrder?: SectionId[];
+  hiddenSections?: SectionId[];
+};
+
+export function PublicPortfolio({
+  userName: userNameProp,
+  mode = "public",
+  sectionOrder,
+  hiddenSections,
+}: PublicPortfolioProps = {}) {
+  const configuredUserName = getPortfolioUserName();
+  const userName = userNameProp || configuredUserName;
+  const preview = mode === "preview";
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(Boolean(userName));
   const [attempt, setAttempt] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState("profile");
+
+  const fromApi = useMemo(() => {
+    if (!portfolio || !portfolio.settings) return null;
+    return applySettingsResponse(portfolio.settings, SECTION_IDS);
+  }, [portfolio]);
+
+  const order = useMemo((): SectionId[] => {
+    if (sectionOrder?.length) return sectionOrder;
+    if (fromApi) return fromApi.order.filter(isSectionId);
+    return [...SECTION_IDS];
+  }, [sectionOrder, fromApi]);
+
+  const hidden = useMemo(() => {
+    const list = hiddenSections ?? fromApi?.hidden.filter(isSectionId) ?? [];
+    return new Set(list);
+  }, [hiddenSections, fromApi]);
+
+  const sectionAllowed = (id: SectionId) => !hidden.has(id);
 
   useEffect(() => {
     if (!userName) return;
@@ -150,7 +193,35 @@ export function PublicPortfolio() {
     };
   }, [userName, attempt]);
 
-  const nav = useMemo(() => (portfolio ? navigationFor(portfolio) : []), [portfolio]);
+  // Public: accent/order/visibility from settings. Never apply admin theme to visitors.
+  useEffect(() => {
+    if (!fromApi) return;
+    writeSiteBrand({
+      theme: fromApi.theme,
+      accent: fromApi.accent,
+      userName: userName || undefined,
+    });
+    if (preview) return;
+    applyPublicAccent(fromApi.accent);
+  }, [preview, fromApi, userName]);
+
+  const nav = useMemo(() => {
+    if (!portfolio) return [];
+    const allowed = (id: SectionId) => !hidden.has(id);
+    const items = navigationFor(portfolio).filter((item) => {
+      if (item.id === "about") return allowed("profile");
+      if ((SECTION_IDS as readonly string[]).includes(item.id)) {
+        return allowed(item.id as SectionId);
+      }
+      return true;
+    });
+    const rank = new Map(order.map((id, index) => [id, index]));
+    return [...items].sort((a, b) => {
+      const aRank = a.id === "about" ? (rank.get("profile") ?? 0) + 0.5 : (rank.get(a.id as SectionId) ?? 99);
+      const bRank = b.id === "about" ? (rank.get("profile") ?? 0) + 0.5 : (rank.get(b.id as SectionId) ?? 99);
+      return aRank - bRank;
+    });
+  }, [portfolio, order, hidden]);
 
   useEffect(() => {
     if (!nav.length) return;
@@ -172,7 +243,7 @@ export function PublicPortfolio() {
     return (
       <main id="content" className="page">
         <section className="clay panel">
-          <p className="kicker">manoj.dossier</p>
+          <Wordmark />
           <h1>Portfolio username is not configured</h1>
           <p className="auth-copy">
             Set NEXT_PUBLIC_PORTFOLIO_USERNAME in frontend/.env.local to the admin username, then restart the dev server.
@@ -197,27 +268,29 @@ export function PublicPortfolio() {
 
   return (
     <>
-      <header className="site-header glass">
-        <Brand />
-        <button type="button" className="btn btn-ghost menu-toggle" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
-          Sections
-        </button>
-        <div className={`nav-drawer ${menuOpen ? "is-open" : ""}`}>
-          <nav className="section-nav" aria-label="Portfolio sections">
-            {nav.map((item) => (
-              <a key={item.id} href={`#${item.id}`} aria-current={active === item.id} onClick={() => setMenuOpen(false)}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
-        </div>
-        <div className="header-tools">
-          <ThemeControls compact />
-          <Link href="/login" className="btn btn-secondary">
-            Manage
-          </Link>
-        </div>
-      </header>
+      {preview ? null : (
+        <header className="site-header glass">
+          <Wordmark href="/" />
+          <button type="button" className="btn btn-ghost menu-toggle" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
+            Sections
+          </button>
+          <div className={`nav-drawer ${menuOpen ? "is-open" : ""}`}>
+            <nav className="section-nav" aria-label="Portfolio sections">
+              {nav.map((item) => (
+                <a key={item.id} href={`#${item.id}`} aria-current={active === item.id} onClick={() => setMenuOpen(false)}>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+          <div className="header-tools">
+            <ThemeControls compact />
+            <Link href="/login" className="btn btn-secondary">
+              Manage
+            </Link>
+          </div>
+        </header>
+      )}
 
       {loading ? <PortfolioSkeleton /> : null}
       {!loading && error ? (
@@ -227,313 +300,337 @@ export function PublicPortfolio() {
       ) : null}
 
       {!loading && portfolio && admin ? (
-        <main id="content" className="page">
-          <section id="profile" className="hero">
-            <div className="hero-copy clay">
-              <p className="kicker">manoj.dossier</p>
-              <h1>{name || "Portfolio"}</h1>
-              {admin.headLine?.trim() ? <p className="headline">{admin.headLine}</p> : null}
-              {admin.currentPosition?.trim() ? <p className="position">{admin.currentPosition}</p> : null}
-              {admin.myQuote?.trim() ? (
-                <blockquote className="quote">
-                  <p>{admin.myQuote}</p>
-                </blockquote>
-              ) : null}
-              {admin.pronoun?.trim() || location ? (
-                <p className="meta">{[admin.pronoun, location].filter(Boolean).join(" · ")}</p>
-              ) : null}
-              <div className="hero-actions">
-                {portfolio.resume ? (
-                  <a className="btn btn-primary" href="#resume">
-                    Resume
-                  </a>
-                ) : null}
-                {portfolio.contact ? (
-                  <a className="btn btn-secondary" href="#contact">
-                    Contact
-                  </a>
-                ) : null}
-              </div>
-            </div>
-            <div className="portrait-frame clay">
-              {portrait ? (
-                // User-provided profile URLs are not known at build time.
-                <img className="portrait" src={portrait} alt={name ? `${name} profile photo` : "Profile photo"} />
-              ) : (
-                <div className="monogram" aria-hidden="true">
-                  {initials(admin.firstName, admin.lastName)}
+        <main id="content" className={preview ? "page preview-page" : "page"}>
+          {order.map((sectionId, index) => {
+            const kicker = String(index + 1).padStart(2, "0");
+            if (!sectionAllowed(sectionId)) return null;
+
+            if (sectionId === "profile") {
+              return (
+                <div key="profile">
+                  <section id="profile" className="hero">
+                    <div className="hero-copy clay">
+                      <h1>{name || "Portfolio"}</h1>
+                      {admin.headLine?.trim() ? <p className="headline">{admin.headLine}</p> : null}
+                      {admin.currentPosition?.trim() ? <p className="position">{admin.currentPosition}</p> : null}
+                      {admin.myQuote?.trim() ? (
+                        <blockquote className="quote">
+                          <p>{admin.myQuote}</p>
+                        </blockquote>
+                      ) : null}
+                      {admin.pronoun?.trim() || location ? (
+                        <p className="meta">{[admin.pronoun, location].filter(Boolean).join(" · ")}</p>
+                      ) : null}
+                      <div className="hero-actions">
+                        {portfolio.resume && sectionAllowed("resume") ? (
+                          <a className="btn btn-primary" href="#resume">
+                            Resume
+                          </a>
+                        ) : null}
+                        {portfolio.contact && sectionAllowed("contact") ? (
+                          <a className="btn btn-secondary" href="#contact">
+                            Contact
+                          </a>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="portrait-frame clay">
+                      {portrait ? (
+                        // User-provided profile URLs are not known at build time.
+                        <img className="portrait" src={portrait} alt={name ? `${name} profile photo` : "Profile photo"} />
+                      ) : (
+                        <div className="monogram" aria-hidden="true">
+                          {initials(admin.firstName, admin.lastName)}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                  {admin.about?.trim() ? (
+                    <Section id="about" kicker={kicker} title="About">
+                      <div className="about-copy clay">{admin.about}</div>
+                    </Section>
+                  ) : null}
                 </div>
-              )}
-            </div>
-          </section>
+              );
+            }
 
-          {admin.about?.trim() ? (
-            <Section id="about" kicker="01" title="About">
-              <div className="about-copy clay">{admin.about}</div>
-            </Section>
-          ) : null}
-
-          {skills.length ? (
-            <Section id="skills" kicker="02" title="Skills">
-              <div className="skill-grid">
-                {skills.map((category) => (
-                  <article key={category.id} className="panel clay">
-                    {category.category?.trim() ? <h3>{category.category}</h3> : null}
-                    <ul className="pills">
-                      {(category.skills ?? [])
-                        .filter((skill) => skill.skill?.trim())
-                        .map((skill) => (
-                          <li key={skill.id}>{skill.skill}</li>
-                        ))}
-                    </ul>
-                  </article>
-                ))}
-              </div>
-            </Section>
-          ) : null}
-
-          {portfolio.experience?.length ? (
-            <Section id="experience" kicker="03" title="Experience">
-              <div className="timeline">
-                {portfolio.experience.map((item) => {
-                  const logo = safeHttpUrl(item.companyLogoUrl);
-                  return (
-                    <article key={item.id} className="clay">
-                      <div className="logo-row">
-                        {logo ? <img src={logo} alt="" /> : null}
-                        <div>
-                          <h3>{item.title}</h3>
-                          <p className="subhead">
-                            {[item.company, item.employmentType, item.locationType].filter(Boolean).join(" · ")}
-                          </p>
-                          <p className="muted">
-                            {formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear, Boolean(item.currentlyWorking))}
-                            {item.location ? ` · ${item.location}` : ""}
-                          </p>
-                        </div>
-                      </div>
-                      {item.description?.trim() ? <p className="prose">{item.description}</p> : null}
-                    </article>
-                  );
-                })}
-              </div>
-            </Section>
-          ) : null}
-
-          {portfolio.project?.length ? (
-            <Section id="projects" kicker="04" title="Projects">
-              <div className="project-grid">
-                {portfolio.project.map((item) => (
-                  <article key={item.id} className="panel clay">
-                    <h3>{item.title}</h3>
-                    <p className="muted">{formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear)}</p>
-                    {item.projectDescription?.trim() ? <p className="prose">{item.projectDescription}</p> : null}
-                    {item.rolesAndResponsibilities?.trim() ? (
-                      <p className="prose">{item.rolesAndResponsibilities}</p>
-                    ) : null}
-                    {splitList(item.techStack).length ? (
-                      <ul className="pills">
-                        {splitList(item.techStack).map((tech) => (
-                          <li key={tech}>{tech}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            </Section>
-          ) : null}
-
-          {portfolio.education?.length ? (
-            <Section id="education" kicker="05" title="Education">
-              <div className="card-grid">
-                {portfolio.education.map((item) => {
-                  const logo = safeHttpUrl(item.schoolLogoUrl);
-                  return (
-                    <article key={item.id} className="panel clay">
-                      <div className="logo-row">
-                        {logo ? <img src={logo} alt="" /> : null}
-                        <div>
-                          <h3>{item.degree || item.school}</h3>
-                          <p className="subhead">{[item.school, item.university, item.fieldOfStudy].filter(Boolean).join(" · ")}</p>
-                        </div>
-                      </div>
-                      <p className="muted">{formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear)}</p>
-                      {item.grade?.trim() ? <p>Grade: {item.grade}</p> : null}
-                      {item.description?.trim() ? <p className="prose">{item.description}</p> : null}
-                      {splitList(item.skills).length ? (
+            if (sectionId === "skills" && skills.length) {
+              return (
+                <Section key="skills" id="skills" kicker={kicker} title="Skills">
+                  <div className="skill-grid">
+                    {skills.map((category) => (
+                      <article key={category.id} className="panel clay">
+                        {category.category?.trim() ? <h3>{category.category}</h3> : null}
                         <ul className="pills">
-                          {splitList(item.skills).map((skill) => (
-                            <li key={skill}>{skill}</li>
-                          ))}
+                          {(category.skills ?? [])
+                            .filter((skill) => skill.skill?.trim())
+                            .map((skill) => (
+                              <li key={skill.id}>{skill.skill}</li>
+                            ))}
                         </ul>
-                      ) : null}
-                      {item.activities?.trim() ? <p className="prose">{item.activities}</p> : null}
-                    </article>
-                  );
-                })}
-              </div>
-            </Section>
-          ) : null}
+                      </article>
+                    ))}
+                  </div>
+                </Section>
+              );
+            }
 
-          {portfolio.licenseAndCertification?.length ? (
-            <Section id="credentials" kicker="06" title="Licenses and certifications">
-              <div className="card-grid">
-                {portfolio.licenseAndCertification.map((item) => {
-                  const logo = safeHttpUrl(item.orgLogoUrl);
-                  const page = safeHttpUrl(item.landcUrl);
-                  const credential = safeHttpUrl(item.credentialUrl);
-                  return (
-                    <article key={item.id} className="panel clay">
-                      <div className="logo-row">
-                        {logo ? <img src={logo} alt="" /> : null}
-                        <div>
-                          <h3>{item.name}</h3>
-                          <p className="subhead">{item.issuingOrganisation}</p>
-                        </div>
-                      </div>
-                      <p className="muted">{formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear)}</p>
-                      {item.credentialId ? <p>Credential ID: {item.credentialId}</p> : null}
-                      <div className="row">
-                        {page ? (
-                          <a href={page} target="_blank" rel="noreferrer">
-                            Certificate page
-                          </a>
+            if (sectionId === "experience" && portfolio.experience?.length) {
+              return (
+                <Section key="experience" id="experience" kicker={kicker} title="Experience">
+                  <div className="timeline">
+                    {portfolio.experience.map((item) => {
+                      const logo = safeHttpUrl(item.companyLogoUrl);
+                      return (
+                        <article key={item.id} className="clay">
+                          <div className="logo-row">
+                            {logo ? <img src={logo} alt="" /> : null}
+                            <div>
+                              <h3>{item.title}</h3>
+                              <p className="subhead">
+                                {[item.company, item.employmentType, item.locationType].filter(Boolean).join(" · ")}
+                              </p>
+                              <p className="muted">
+                                {formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear, Boolean(item.currentlyWorking))}
+                                {item.location ? ` · ${item.location}` : ""}
+                              </p>
+                            </div>
+                          </div>
+                          {item.description?.trim() ? <p className="prose">{item.description}</p> : null}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </Section>
+              );
+            }
+
+            if (sectionId === "projects" && portfolio.project?.length) {
+              return (
+                <Section key="projects" id="projects" kicker={kicker} title="Projects">
+                  <div className="project-grid">
+                    {portfolio.project.map((item) => (
+                      <article key={item.id} className="panel clay">
+                        <h3>{item.title}</h3>
+                        <p className="muted">{formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear)}</p>
+                        {item.projectDescription?.trim() ? <p className="prose">{item.projectDescription}</p> : null}
+                        {item.rolesAndResponsibilities?.trim() ? (
+                          <p className="prose">{item.rolesAndResponsibilities}</p>
                         ) : null}
-                        {credential ? (
-                          <a href={credential} target="_blank" rel="noreferrer">
-                            Verify credential
-                          </a>
+                        {splitList(item.techStack).length ? (
+                          <ul className="pills">
+                            {splitList(item.techStack).map((tech) => (
+                              <li key={tech}>{tech}</li>
+                            ))}
+                          </ul>
                         ) : null}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </Section>
-          ) : null}
+                      </article>
+                    ))}
+                  </div>
+                </Section>
+              );
+            }
 
-          {portfolio.link?.length ? (
-            <Section id="links" kicker="07" title="Links">
-              <div className="link-row">
-                {portfolio.link.map((item) => {
-                  const href = safeHttpUrl(item.url);
-                  const content = (
-                    <>
-                      <span className="link-mark" aria-hidden="true">
-                        {(item.platform || "L").slice(0, 1).toUpperCase()}
-                      </span>
-                      <span>
-                        <strong>{item.platform || "Link"}</strong>
-                        <span className="muted" style={{ display: "block" }}>
-                          {href ? new URL(href).host : "Unavailable"}
-                        </span>
-                      </span>
-                    </>
-                  );
-                  return href ? (
-                    <a key={item.id} className="link-card clay" href={href} target="_blank" rel="noreferrer">
-                      {content}
-                    </a>
-                  ) : (
-                    <article key={item.id} className="link-card clay">
-                      {content}
-                    </article>
-                  );
-                })}
-              </div>
-            </Section>
-          ) : null}
+            if (sectionId === "education" && portfolio.education?.length) {
+              return (
+                <Section key="education" id="education" kicker={kicker} title="Education">
+                  <div className="card-grid">
+                    {portfolio.education.map((item) => {
+                      const logo = safeHttpUrl(item.schoolLogoUrl);
+                      return (
+                        <article key={item.id} className="panel clay">
+                          <div className="logo-row">
+                            {logo ? <img src={logo} alt="" /> : null}
+                            <div>
+                              <h3>{item.degree || item.school}</h3>
+                              <p className="subhead">{[item.school, item.university, item.fieldOfStudy].filter(Boolean).join(" · ")}</p>
+                            </div>
+                          </div>
+                          <p className="muted">{formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear)}</p>
+                          {item.grade?.trim() ? <p>Grade: {item.grade}</p> : null}
+                          {item.description?.trim() ? <p className="prose">{item.description}</p> : null}
+                          {splitList(item.skills).length ? (
+                            <ul className="pills">
+                              {splitList(item.skills).map((skill) => (
+                                <li key={skill}>{skill}</li>
+                              ))}
+                            </ul>
+                          ) : null}
+                          {item.activities?.trim() ? <p className="prose">{item.activities}</p> : null}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </Section>
+              );
+            }
 
-          {portfolio.activity?.length ? (
-            <Section id="activities" kicker="08" title="Activities">
-              <div className="card-grid">
-                {portfolio.activity.map((item) => {
-                  const media = safeHttpUrl(item.activityMediaUrl);
-                  return (
-                    <article key={item.id} className="panel clay">
-                      {item.activityDescription?.trim() ? <p className="prose">{item.activityDescription}</p> : null}
-                      {media && isImageUrl(media) ? (
-                        <img className="media-frame" src={media} alt="" />
-                      ) : null}
-                      {media && !isImageUrl(media) ? (
+            if (sectionId === "credentials" && portfolio.licenseAndCertification?.length) {
+              return (
+                <Section key="credentials" id="credentials" kicker={kicker} title="Licenses and certifications">
+                  <div className="card-grid">
+                    {portfolio.licenseAndCertification.map((item) => {
+                      const logo = safeHttpUrl(item.orgLogoUrl);
+                      const page = safeHttpUrl(item.landcUrl);
+                      const credential = safeHttpUrl(item.credentialUrl);
+                      return (
+                        <article key={item.id} className="panel clay">
+                          <div className="logo-row">
+                            {logo ? <img src={logo} alt="" /> : null}
+                            <div>
+                              <h3>{item.name}</h3>
+                              <p className="subhead">{item.issuingOrganisation}</p>
+                            </div>
+                          </div>
+                          <p className="muted">{formatPeriod(item.startMonth, item.startYear, item.endMonth, item.endYear)}</p>
+                          {item.credentialId ? <p>Credential ID: {item.credentialId}</p> : null}
+                          <div className="row">
+                            {page ? (
+                              <a href={page} target="_blank" rel="noreferrer">
+                                Certificate page
+                              </a>
+                            ) : null}
+                            {credential ? (
+                              <a href={credential} target="_blank" rel="noreferrer">
+                                Verify credential
+                              </a>
+                            ) : null}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </Section>
+              );
+            }
+
+            if (sectionId === "links" && portfolio.link?.length) {
+              return (
+                <Section key="links" id="links" kicker={kicker} title="Links">
+                  <div className="link-row">
+                    {portfolio.link.map((item) => {
+                      const href = safeHttpUrl(item.url);
+                      const content = (
+                        <>
+                          <span className="link-mark" aria-hidden="true">
+                            {(item.platform || "L").slice(0, 1).toUpperCase()}
+                          </span>
+                          <span>
+                            <strong>{item.platform || "Link"}</strong>
+                            <span className="muted" style={{ display: "block" }}>
+                              {href ? new URL(href).host : "Unavailable"}
+                            </span>
+                          </span>
+                        </>
+                      );
+                      return href ? (
+                        <a key={item.id} className="link-card clay" href={href} target="_blank" rel="noreferrer">
+                          {content}
+                        </a>
+                      ) : (
+                        <article key={item.id} className="link-card clay">
+                          {content}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </Section>
+              );
+            }
+
+            if (sectionId === "activities" && portfolio.activity?.length) {
+              return (
+                <Section key="activities" id="activities" kicker={kicker} title="Activities">
+                  <div className="card-grid">
+                    {portfolio.activity.map((item) => {
+                      const media = safeHttpUrl(item.activityMediaUrl);
+                      return (
+                        <article key={item.id} className="panel clay">
+                          {item.activityDescription?.trim() ? <p className="prose">{item.activityDescription}</p> : null}
+                          {media && isImageUrl(media) ? <img className="media-frame" src={media} alt="" /> : null}
+                          {media && !isImageUrl(media) ? (
+                            <p>
+                              <a href={media} target="_blank" rel="noreferrer">
+                                View activity media
+                              </a>
+                            </p>
+                          ) : null}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </Section>
+              );
+            }
+
+            if (sectionId === "resume" && portfolio.resume) {
+              return (
+                <Section key="resume" id="resume" kicker={kicker} title="Resume">
+                  <article className="panel clay spread">
+                    <div>
+                      <h3>{portfolio.resume.fileName || "Resume"}</h3>
+                      <p className="muted">
+                        {[formatBytes(portfolio.resume.fileSize), formatTimestamp(portfolio.resume.uploadedAt)].filter(Boolean).join(" · ")}
+                      </p>
+                    </div>
+                    <div className="row">
+                      <a className="btn btn-primary" href={publicResumeUrl(userName)} target="_blank" rel="noreferrer">
+                        View
+                      </a>
+                      <Button
+                        variant="secondary"
+                        onClick={() => {
+                          void fetch(publicResumeUrl(userName))
+                            .then((response) => {
+                              if (!response.ok) throw new Error("unavailable");
+                              return response.blob();
+                            })
+                            .then((blob) => downloadBlob(blob, portfolio.resume?.fileName || "resume.pdf"))
+                            .catch(() => {
+                              window.open(publicResumeUrl(userName), "_blank", "noopener,noreferrer");
+                            });
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </div>
+                  </article>
+                </Section>
+              );
+            }
+
+            if (sectionId === "contact" && portfolio.contact) {
+              return (
+                <Section key="contact" id="contact" kicker={kicker} title="Contact">
+                  <div className="contact-layout">
+                    <article className="contact-card clay">
+                      <h3>Reach me</h3>
+                      {portfolio.contact.email ? (
                         <p>
-                          <a href={media} target="_blank" rel="noreferrer">
-                            View activity media
-                          </a>
+                          Email
+                          <a href={`mailto:${portfolio.contact.email}`}>{portfolio.contact.email}</a>
                         </p>
                       ) : null}
+                      {portfolio.contact.phone ? (
+                        <p>
+                          Phone
+                          <a href={`tel:${portfolio.contact.phone}`}>{portfolio.contact.phone}</a>
+                        </p>
+                      ) : null}
+                      {location ? <p className="muted">{location}</p> : null}
                     </article>
-                  );
-                })}
-              </div>
-            </Section>
-          ) : null}
+                    {preview ? null : <ContactForm userName={userName} />}
+                  </div>
+                </Section>
+              );
+            }
 
-          {portfolio.resume ? (
-            <Section id="resume" kicker="09" title="Resume">
-              <article className="panel clay spread">
-                <div>
-                  <h3>{portfolio.resume.fileName || "Resume"}</h3>
-                  <p className="muted">
-                    {[formatBytes(portfolio.resume.fileSize), formatTimestamp(portfolio.resume.uploadedAt)].filter(Boolean).join(" · ")}
-                  </p>
-                </div>
-                <div className="row">
-                  <a className="btn btn-primary" href={publicResumeUrl(userName)} target="_blank" rel="noreferrer">
-                    View
-                  </a>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      void fetch(publicResumeUrl(userName))
-                        .then((response) => {
-                          if (!response.ok) throw new Error("unavailable");
-                          return response.blob();
-                        })
-                        .then((blob) => downloadBlob(blob, portfolio.resume?.fileName || "resume.pdf"))
-                        .catch(() => {
-                          window.open(publicResumeUrl(userName), "_blank", "noopener,noreferrer");
-                        });
-                    }}
-                  >
-                    Download
-                  </Button>
-                </div>
-              </article>
-            </Section>
-          ) : null}
-
-          {portfolio.contact ? (
-            <Section id="contact" kicker="10" title="Contact">
-              <div className="contact-layout">
-                <article className="contact-card clay">
-                  <h3>Reach me</h3>
-                  {portfolio.contact.email ? (
-                    <p>
-                      Email
-                      <a href={`mailto:${portfolio.contact.email}`}>{portfolio.contact.email}</a>
-                    </p>
-                  ) : null}
-                  {portfolio.contact.phone ? (
-                    <p>
-                      Phone
-                      <a href={`tel:${portfolio.contact.phone}`}>{portfolio.contact.phone}</a>
-                    </p>
-                  ) : null}
-                  {location ? <p className="muted">{location}</p> : null}
-                </article>
-                <ContactForm />
-              </div>
-            </Section>
-          ) : null}
+            return null;
+          })}
         </main>
       ) : null}
 
-      <footer className="site-footer glass">
-        <span>manoj.dossier</span>
-        <Link href="/login">Admin studio</Link>
-      </footer>
+      {preview ? null : <SiteFooter className="site-footer" />}
     </>
   );
 }

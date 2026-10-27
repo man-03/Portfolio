@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/controls";
 
 type ConfirmDialogProps = {
@@ -67,9 +68,9 @@ export function ConfirmDialog({
     };
   }, [open, onClose, pending]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div className="dialog-backdrop" onMouseDown={pending ? undefined : onClose}>
       <div
         ref={dialogRef}
@@ -90,6 +91,7 @@ export function ConfirmDialog({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

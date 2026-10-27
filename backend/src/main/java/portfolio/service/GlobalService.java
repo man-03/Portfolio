@@ -23,6 +23,7 @@ public class GlobalService {
     final private AdminSkillRepository adminSkillRepository;
     final private AdminActivityRepository adminActivityRepository;
     final private AdminResumeRepository adminResumeRepository;
+    final private AdminPortfolioSettingsRepository adminPortfolioSettingsRepository;
     final private AdminMapper adminMapper;
 
     public GlobalService(AdminRepository adminRepository, AdminAddressRepository adminAddressRepository, AdminContactRepository adminContactRepository,
@@ -30,6 +31,7 @@ public class GlobalService {
                          AdminProjectRepository adminProjectRepository, AdminEducationRepository adminEducationRepository,
                          LicenseAndCertificationRepository licenseAndCertificationRepository, AdminSkillsCategoryRepository adminSkillsCategoryRepository,
                          AdminSkillRepository adminSkillRepository, AdminActivityRepository adminActivityRepository,
+                         AdminPortfolioSettingsRepository adminPortfolioSettingsRepository,
                          AdminMapper adminMapper, AdminResumeRepository adminResumeRepository) {
         this.adminRepository = adminRepository;
         this.adminAddressRepository = adminAddressRepository;
@@ -42,6 +44,7 @@ public class GlobalService {
         this.adminSkillsCategoryRepository = adminSkillsCategoryRepository;
         this.adminSkillRepository = adminSkillRepository;
         this.adminActivityRepository = adminActivityRepository;
+        this.adminPortfolioSettingsRepository = adminPortfolioSettingsRepository;
         this.adminMapper = adminMapper;
         this.adminResumeRepository = adminResumeRepository;
     }
@@ -111,6 +114,9 @@ public class GlobalService {
                 ))
                 .orElse(null);
 
+        AdminPortfolioSettings adminPortfolioSettings = adminPortfolioSettingsRepository.findByAdmin_Id(adminId).orElseThrow(() -> new RuntimeException("Settings Not Found"));
+        AdminPortfolioSettingsResponseDTO adminPortfolioSettingsResponseDTO = adminMapper.convertSettingsToDTO(adminPortfolioSettings);
+
         globalResponseDTO.setAdmin(adminResponseDTO);
         globalResponseDTO.setContact(adminContactResponseDTO);
         globalResponseDTO.setLink(adminLinkResponseDTO);
@@ -121,6 +127,7 @@ public class GlobalService {
         globalResponseDTO.setSkills(adminSkillsAggregateResponseDTO);
         globalResponseDTO.setActivity(adminActivityResponseDTOS);
         globalResponseDTO.setResume(resumeResponse);
+        globalResponseDTO.setSettings(adminPortfolioSettingsResponseDTO);
 
         return globalResponseDTO;
     }
